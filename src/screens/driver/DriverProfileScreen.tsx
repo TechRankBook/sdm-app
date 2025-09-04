@@ -133,45 +133,45 @@ export default function DriverProfileScreen() {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-secondary-50">
+    <ScrollView style={styles.container}>
       {/* Profile Header */}
-      <View className="glass mx-5 mt-5 p-6 rounded-2xl border border-glass-border shadow-glass flex-row items-center">
-        <View className="w-16 h-16 bg-success rounded-full justify-center items-center mr-4">
-          <Text className="text-2xl font-bold text-success">
+      <View style={styles.header}>
+        <View style={styles.avatarContainer}>
+          <Text style={styles.avatarText}>
             {user?.full_name?.charAt(0)?.toUpperCase() || 'D'}
           </Text>
         </View>
-        <View className="flex-1">
+        <View style={styles.userInfo}>
           {isEditing ? (
             <TextInput
-              className="text-xl font-bold text-foreground border border-input rounded-lg px-3 py-2 mb-2 bg-background"
+              style={styles.nameInput}
               value={editedName}
               onChangeText={setEditedName}
               placeholder="Enter your name"
               autoCapitalize="words"
-              placeholderTextColor="hsl(var(--muted-foreground))"
+              placeholderTextColor="#64748b"
             />
           ) : (
-            <Text className="text-xl font-bold text-foreground mb-1">{user?.full_name || 'Driver'}</Text>
+            <Text style={styles.userName}>{user?.full_name || 'Driver'}</Text>
           )}
-          <Text className="text-muted-foreground text-sm mb-1">{user?.email}</Text>
+          <Text style={styles.userEmail}>{user?.email}</Text>
           {isEditing ? (
             <TextInput
-              className="text-sm text-muted-foreground border border-input rounded-lg px-3 py-2 bg-background"
+              style={styles.phoneInput}
               value={editedPhone}
               onChangeText={setEditedPhone}
               placeholder="Enter phone number"
               keyboardType="phone-pad"
-              placeholderTextColor="hsl(var(--muted-foreground))"
+              placeholderTextColor="#64748b"
             />
           ) : (
-            <Text className="text-sm text-muted-foreground">
+            <Text style={styles.userPhone}>
               {user?.phone || 'No phone number'}
             </Text>
           )}
         </View>
         <TouchableOpacity
-          className="bg-success px-4 py-2 rounded-lg ml-2"
+          style={styles.editButton}
           onPress={() => {
             if (isEditing) {
               handleSaveProfile();
@@ -180,52 +180,52 @@ export default function DriverProfileScreen() {
             }
           }}
         >
-          <Text className="text-success text-sm font-medium">
+          <Text style={styles.editButtonText}>
             {isEditing ? 'Save' : 'Edit'}
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Driver Stats */}
-      <View className="glass mx-5 mt-5 p-5 rounded-2xl border border-glass-border shadow-elevation">
-        <View className="flex-row justify-around">
+      <View style={styles.statsContainer}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
           {driverStats.map((stat, index) => (
-            <View key={index} className="items-center">
-              <Text className="text-3xl mb-2">{stat.icon}</Text>
-              <Text className="text-xl font-bold text-foreground mb-1">{stat.value}</Text>
-              <Text className="text-xs text-muted-foreground text-center">{stat.label}</Text>
+            <View key={index} style={styles.statItem}>
+              <Text style={styles.statIcon}>{stat.icon}</Text>
+              <Text style={styles.statValue}>{stat.value}</Text>
+              <Text style={styles.statLabel}>{stat.label}</Text>
             </View>
           ))}
         </View>
       </View>
 
       {/* Menu Items */}
-      <View className="glass mx-5 mt-5 rounded-2xl overflow-hidden border border-glass-border shadow-glass">
+      <View style={styles.menuContainer}>
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            className="flex-row items-center justify-between px-5 py-4 border-b border-border"
+            style={styles.menuItem}
             onPress={item.onPress}
           >
-            <View className="flex-row items-center flex-1">
-              <Text className="text-2xl mr-4 w-6 text-center">{item.icon}</Text>
-              <View className="flex-1">
-                <Text className="text-base font-medium text-foreground mb-1">{item.title}</Text>
-                <Text className="text-sm text-muted-foreground">{item.subtitle}</Text>
+            <View style={styles.menuItemLeft}>
+              <Text style={styles.menuItemIcon}>{item.icon}</Text>
+              <View style={styles.menuItemText}>
+                <Text style={styles.menuItemTitle}>{item.title}</Text>
+                <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
               </View>
             </View>
-            <Text className="text-lg text-muted-foreground">›</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       {/* Logout Button */}
-      <View className="px-5 py-6 pb-10">
+      <View style={styles.logoutContainer}>
         <TouchableOpacity
-          className="bg-destructive py-3 rounded-lg items-center shadow-elevation"
+          style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text className="text-destructive-foreground font-semibold text-base">Logout</Text>
+          <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

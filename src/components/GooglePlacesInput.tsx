@@ -4,8 +4,9 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  FlatList,
+  ScrollView,
   Alert,
+  StyleSheet,
 } from 'react-native';
 import { GOOGLE_MAPS_API_KEY } from '@/constants';
 
@@ -89,6 +90,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   };
 
   const handlePlaceSelect = async (prediction: PlacePrediction) => {
+    console.log('Place selected:', prediction.description);
     try {
       // Get place details
       const detailsResponse = await fetch(
@@ -109,10 +111,13 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           formatted_address: detailsData.result.formatted_address,
         };
 
+        console.log('Place details fetched successfully:', place);
         onPlaceSelect(place);
         onChange(prediction.description);
         setShowPredictions(false);
         inputRef.current?.blur();
+      } else {
+        console.error('Place details API error:', detailsData.status);
       }
     } catch (error) {
       console.error('Place details error:', error);
@@ -136,23 +141,14 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     }
   };
 
-  const renderPrediction = ({ item }: { item: PlacePrediction }) => (
-    <TouchableOpacity
-      className="p-4 border-b border-slate-200 bg-white"
-      onPress={() => handlePlaceSelect(item)}
-    >
-      <Text className="text-slate-800 font-medium">{item.structured_formatting.main_text}</Text>
-      <Text className="text-slate-500 text-sm">{item.structured_formatting.secondary_text}</Text>
-    </TouchableOpacity>
-  );
 
   return (
-    <View className="relative">
-      <View className="flex-row items-center bg-white p-4 rounded-lg border border-slate-200">
-        <Text className="text-lg mr-3">{getIcon()}</Text>
+    <View style={styles.container} pointerEvents="box-none">
+      <View style={styles.inputContainer}>
+        <Text style={styles.inputIcon}>{getIcon()}</Text>
         <TextInput
           ref={inputRef}
-          className="flex-1 text-base"
+          style={styles.textInput}
           placeholder={placeholder}
           value={value}
           onChangeText={handleTextChange}
@@ -166,31 +162,119 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
             setTimeout(() => setShowPredictions(false), 200);
           }}
         />
-        {isLoading && <Text className="text-slate-400">...</Text>}
+        {isLoading && <Text style={styles.loadingText}>...</Text>}
       </View>
 
       {showPredictions && predictions.length > 0 && (
-        <View className="absolute top-full left-0 right-0 bg-white border border-slate-200 rounded-lg shadow-lg z-50 max-h-60">
-          <FlatList
-            data={predictions}
-            keyExtractor={(item) => item.place_id}
-            renderItem={renderPrediction}
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
+        <ScrollView
+          style={styles.predictionsContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+          nestedScrollEnabled={true}
+          pointerEvents="auto"
+        >
+          {predictions.map((item) => (
+            <TouchableOpacity
+              key={item.place_id}
+              style={styles.predictionItem}
+              onPress={() => {
+                console.log('TouchableOpacity pressed for:', item.description);
+                handlePlaceSelect(item);
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.predictionMainText}>{item.structured_formatting.main_text}</Text>
+              <Text style={styles.predictionSecondaryText}>{item.structured_formatting.secondary_text}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       )}
 
       {showCurrentLocation && (
         <TouchableOpacity
-          className="mt-2 p-2 bg-blue-50 rounded-lg items-center"
+          style={styles.currentLocationButton}
           onPress={() => {
             // This would integrate with device location
             Alert.alert('Current Location', 'Location service integration coming soon');
           }}
         >
-          <Text className="text-blue-600 text-sm font-medium">📍 Use Current Location</Text>
+          <Text style={styles.currentLocationText}>📍 Use Current Location</Text>
         </TouchableOpacity>
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  inputIcon: {
+    fontSize: 18,
+    marginRight: 12,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 16,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#64748b',
+  },
+  predictionsContainer: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
+    zIndex: 1000,
+    maxHeight: 240,
+  },
+  predictionItem: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  predictionMainText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1e293b',
+  },
+  predictionSecondaryText: {
+    fontSize: 14,
+    color: '#64748b',
+    marginTop: 4,
+  },
+  currentLocationButton: {
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: '#eff6ff',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  currentLocationText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#2563eb',
+  },
+});

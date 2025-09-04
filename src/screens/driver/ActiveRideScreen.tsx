@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  StyleSheet,
 } from 'react-native';
 
 export default function ActiveRideScreen() {
@@ -61,110 +62,123 @@ export default function ActiveRideScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-slate-50">
+    <ScrollView style={styles.container}>
       {/* Ride Status */}
-      <View className="bg-white mx-5 mt-5 p-5 rounded-xl items-center shadow-lg">
-        <Text className="text-lg font-semibold text-slate-800 mb-5">Ride Status</Text>
-        <View className="flex-row items-center mb-2">
-          <View className={`w-3 h-3 rounded-full mr-2 ${rideStatus === 'pickup' ? 'bg-blue-600' : 'bg-slate-300'}`} />
-          <Text className="text-sm text-slate-700">Pickup</Text>
-        </View>
-        <View className="w-0.5 h-5 bg-slate-200 my-1" />
-        <View className="flex-row items-center mb-2">
-          <View className={`w-3 h-3 rounded-full mr-2 ${rideStatus === 'in_progress' ? 'bg-blue-600' : 'bg-slate-300'}`} />
-          <Text className="text-sm text-slate-700">In Progress</Text>
-        </View>
-        <View className="w-0.5 h-5 bg-slate-200 my-1" />
-        <View className="flex-row items-center">
-          <View className={`w-3 h-3 rounded-full mr-2 ${rideStatus === 'completed' ? 'bg-blue-600' : 'bg-slate-300'}`} />
-          <Text className="text-sm text-slate-700">Completed</Text>
+      <View style={styles.card}>
+        <Text style={styles.statusTitle}>Ride Status</Text>
+        <View style={styles.statusContainer}>
+          <View style={styles.statusStep}>
+            <View style={[
+              styles.statusDot,
+              rideStatus === 'pickup' ? styles.statusDotActive : styles.statusDotInactive
+            ]} />
+            <Text style={styles.statusText}>Pickup</Text>
+          </View>
+          <View style={styles.statusLine} />
+          <View style={styles.statusStep}>
+            <View style={[
+              styles.statusDot,
+              rideStatus === 'in_progress' ? styles.statusDotActive : styles.statusDotInactive
+            ]} />
+            <Text style={styles.statusText}>In Progress</Text>
+          </View>
+          <View style={styles.statusLine} />
+          <View style={styles.statusStep}>
+            <View style={[
+              styles.statusDot,
+              rideStatus === 'completed' ? styles.statusDotActive : styles.statusDotInactive
+            ]} />
+            <Text style={styles.statusText}>Completed</Text>
+          </View>
         </View>
       </View>
 
       {/* Customer Info */}
-      <View className="bg-white mx-5 mb-5 p-5 rounded-xl shadow-lg">
-        <Text className="text-lg font-semibold text-slate-800 mb-4">Customer Details</Text>
-        <View className="mb-4">
-          <Text className="text-base font-semibold text-slate-800 mb-1">{activeRide.customerName}</Text>
-          <Text className="text-sm text-slate-500">{activeRide.customerPhone}</Text>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Customer Details</Text>
+        <View style={{ marginBottom: 16 }}>
+          <Text style={styles.customerName}>{activeRide.customerName}</Text>
+          <Text style={styles.customerPhone}>{activeRide.customerPhone}</Text>
         </View>
         <TouchableOpacity
-          className="bg-blue-600 py-3 rounded-lg items-center"
+          style={styles.callButton}
           onPress={handleCallCustomer}
         >
-          <Text className="text-sm font-medium text-white">📞 Call Customer</Text>
+          <Text style={styles.callButtonText}>📞 Call Customer</Text>
         </TouchableOpacity>
       </View>
 
       {/* Ride Details */}
-      <View className="bg-white mx-5 mb-5 p-5 rounded-xl shadow-lg">
-        <Text className="text-lg font-semibold text-slate-800 mb-4">Ride Details</Text>
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>Ride Details</Text>
 
-        <View className="mb-5">
-          <View className="flex-row items-center mb-2">
-            <Text className="text-sm text-blue-600 mr-3 w-4 text-center">●</Text>
-            <Text className="text-sm text-slate-700 flex-1">{activeRide.pickup}</Text>
+        <View style={styles.rideDetails}>
+          <View style={styles.routeContainer}>
+            <View style={styles.routeStep}>
+              <Text style={styles.routeDot}>●</Text>
+              <Text style={styles.routeText}>{activeRide.pickup}</Text>
+            </View>
+            <View style={styles.routeLine} />
+            <View style={styles.routeStep}>
+              <Text style={styles.routeDot}>●</Text>
+              <Text style={styles.routeText}>{activeRide.drop}</Text>
+            </View>
           </View>
-          <View className="h-5 w-0.5 bg-slate-200 ml-1.5 mb-2" />
-          <View className="flex-row items-center">
-            <Text className="text-sm text-blue-600 mr-3 w-4 text-center">●</Text>
-            <Text className="text-sm text-slate-700 flex-1">{activeRide.drop}</Text>
-          </View>
-        </View>
 
-        <View className="bg-slate-50 rounded-lg p-4">
-          <View className="flex-row justify-between mb-3">
-            <Text className="text-sm text-slate-500">Distance:</Text>
-            <Text className="text-sm font-medium text-slate-800">{activeRide.distance}</Text>
-          </View>
-          <View className="flex-row justify-between mb-3">
-            <Text className="text-sm text-slate-500">Duration:</Text>
-            <Text className="text-sm font-medium text-slate-800">{activeRide.duration}</Text>
-          </View>
-          <View className="flex-row justify-between mb-3">
-            <Text className="text-sm text-slate-500">Vehicle:</Text>
-            <Text className="text-sm font-medium text-slate-800">{activeRide.vehicleType}</Text>
-          </View>
-          <View className="flex-row justify-between">
-            <Text className="text-sm text-slate-500">Fare:</Text>
-            <Text className="text-sm font-medium text-slate-800">₹{activeRide.fare}</Text>
+          <View style={styles.detailsCard}>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Distance:</Text>
+              <Text style={styles.detailValue}>{activeRide.distance}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Duration:</Text>
+              <Text style={styles.detailValue}>{activeRide.duration}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Vehicle:</Text>
+              <Text style={styles.detailValue}>{activeRide.vehicleType}</Text>
+            </View>
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Fare:</Text>
+              <Text style={styles.detailValue}>₹{activeRide.fare}</Text>
+            </View>
           </View>
         </View>
       </View>
 
       {/* Action Buttons */}
-      <View className="px-5 mb-5">
+      <View style={styles.actionContainer}>
         {rideStatus === 'pickup' && (
           <TouchableOpacity
-            className="bg-blue-600 py-4 rounded-lg items-center mb-3"
+            style={[styles.actionButton, styles.actionButtonPrimary]}
             onPress={handleArrivedAtPickup}
           >
-            <Text className="text-base font-semibold text-white">Arrived at Pickup</Text>
+            <Text style={styles.actionButtonText}>Arrived at Pickup</Text>
           </TouchableOpacity>
         )}
 
         {rideStatus === 'in_progress' && (
           <TouchableOpacity
-            className="bg-blue-600 py-4 rounded-lg items-center mb-3"
+            style={[styles.actionButton, styles.actionButtonPrimary]}
             onPress={handleStartRide}
           >
-            <Text className="text-base font-semibold text-white">Start Ride</Text>
+            <Text style={styles.actionButtonText}>Start Ride</Text>
           </TouchableOpacity>
         )}
 
         {rideStatus === 'in_progress' && (
           <TouchableOpacity
-            className="bg-green-600 py-4 rounded-lg items-center"
+            style={[styles.actionButton, styles.actionButtonSuccess]}
             onPress={handleCompleteRide}
           >
-            <Text className="text-base font-semibold text-white">Complete Ride</Text>
+            <Text style={styles.actionButtonText}>Complete Ride</Text>
           </TouchableOpacity>
         )}
 
         {rideStatus === 'completed' && (
-          <View className="bg-green-50 p-5 rounded-xl items-center border border-green-200">
-            <Text className="text-lg font-semibold text-green-800 mb-2">✅ Ride Completed</Text>
-            <Text className="text-sm text-green-800 text-center">
+          <View style={styles.completedCard}>
+            <Text style={styles.completedTitle}>✅ Ride Completed</Text>
+            <Text style={styles.completedText}>
               Payment of ₹{activeRide.fare} will be credited to your account
             </Text>
           </View>
@@ -172,14 +186,203 @@ export default function ActiveRideScreen() {
       </View>
 
       {/* Emergency Button */}
-      <View className="px-5 pb-10">
+      <View style={styles.emergencyContainer}>
         <TouchableOpacity
-          className="bg-red-600 py-4 rounded-lg items-center"
+          style={styles.emergencyButton}
           onPress={handleEmergency}
         >
-          <Text className="text-base font-semibold text-white">🚨 Emergency</Text>
+          <Text style={styles.emergencyButtonText}>🚨 Emergency</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 20,
+  },
+  statusContainer: {
+    alignItems: 'center',
+  },
+  statusTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 20,
+  },
+  statusStep: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statusDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: 8,
+  },
+  statusDotActive: {
+    backgroundColor: '#2563eb',
+  },
+  statusDotInactive: {
+    backgroundColor: '#cbd5e1',
+  },
+  statusText: {
+    fontSize: 14,
+    color: '#475569',
+  },
+  statusLine: {
+    width: 1,
+    height: 20,
+    backgroundColor: '#e2e8f0',
+    marginVertical: 4,
+  },
+  customerName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  customerPhone: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  callButton: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  callButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#ffffff',
+  },
+  rideDetails: {
+    marginBottom: 20,
+  },
+  routeContainer: {
+    marginBottom: 20,
+  },
+  routeStep: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  routeDot: {
+    fontSize: 14,
+    color: '#2563eb',
+    marginRight: 12,
+    width: 16,
+    textAlign: 'center',
+  },
+  routeText: {
+    fontSize: 14,
+    color: '#475569',
+    flex: 1,
+  },
+  routeLine: {
+    height: 20,
+    width: 1,
+    backgroundColor: '#e2e8f0',
+    marginLeft: 7,
+    marginBottom: 8,
+  },
+  detailsCard: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+    padding: 16,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  detailValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1e293b',
+  },
+  actionContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  actionButton: {
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  actionButtonPrimary: {
+    backgroundColor: '#2563eb',
+  },
+  actionButtonSuccess: {
+    backgroundColor: '#16a34a',
+  },
+  actionButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  completedCard: {
+    backgroundColor: '#f0fdf4',
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#bbf7d0',
+  },
+  completedTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#166534',
+    marginBottom: 8,
+  },
+  completedText: {
+    fontSize: 14,
+    color: '#166534',
+    textAlign: 'center',
+  },
+  emergencyContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  emergencyButton: {
+    backgroundColor: '#dc2626',
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  emergencyButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+});

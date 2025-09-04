@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -63,77 +64,213 @@ export default function HomeScreen() {
       subtitle: 'Find and book your next ride',
       icon: '🚗',
       onPress: handleBookRide,
-      color: 'primary',
+      color: '#2563eb',
     },
     {
       title: 'Ride History',
       subtitle: 'View your past rides',
       icon: '📋',
       onPress: handleViewHistory,
-      color: 'success',
+      color: '#10b981',
     },
     {
       title: 'My Profile',
       subtitle: 'Manage your account',
       icon: '👤',
       onPress: handleViewProfile,
-      color: 'destructive',
+      color: '#ef4444',
     },
     {
       title: 'Support',
       subtitle: 'Get help and support',
       icon: '🆘',
       onPress: () => navigation.navigate('Support'),
-      color: 'warning',
+      color: '#f59e0b',
     },
   ];
 
   return (
-    <ScrollView className="flex-1 bg-secondary-50">
+    <ScrollView style={styles.container}>
       {/* Welcome Header */}
-      <View className="glass mx-5 mt-5 p-6 rounded-2xl border border-glass-border shadow-glass">
-        <Text className="text-muted-foreground text-base mb-2">Welcome back,</Text>
-        <Text className="text-foreground text-2xl font-bold mb-2">{user?.full_name || 'Customer'}</Text>
-        <Text className="text-muted-foreground text-base">Ready for your next ride?</Text>
+      <View style={styles.header}>
+        <Text style={styles.welcomeText}>Welcome back,</Text>
+        <Text style={styles.userName}>{user?.full_name || 'Customer'}</Text>
+        <Text style={styles.subtitle}>Ready for your next ride?</Text>
       </View>
 
       {/* Quick Actions */}
-      <View className="px-5 mt-6">
-        <Text className="text-foreground text-xl font-semibold mb-4">Quick Actions</Text>
-        <View className="flex-row flex-wrap gap-3">
+      <View style={styles.actionsSection}>
+        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <View style={styles.actionsGrid}>
           {quickActions.map((action, index) => (
             <TouchableOpacity
               key={index}
-              className={`flex-1 min-w-[45%] glass p-4 rounded-xl border border-glass-border shadow-elevation`}
+              style={[styles.actionCard, { borderLeftColor: action.color }]}
               onPress={action.onPress}
             >
-              <Text className="text-3xl mb-3">{action.icon}</Text>
-              <Text className="text-foreground text-base font-semibold mb-1">{action.title}</Text>
-              <Text className="text-muted-foreground text-sm leading-4">{action.subtitle}</Text>
+              <Text style={styles.actionIcon}>{action.icon}</Text>
+              <Text style={styles.actionTitle}>{action.title}</Text>
+              <Text style={styles.actionSubtitle}>{action.subtitle}</Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
       {/* Recent Activity */}
-      <View className="px-5 mt-6">
-        <Text className="text-foreground text-xl font-semibold mb-4">Recent Activity</Text>
-        <View className="glass p-6 rounded-xl border border-glass-border shadow-elevation">
-          <Text className="text-muted-foreground text-base text-center">
+      <View style={styles.activitySection}>
+        <Text style={styles.sectionTitle}>Recent Activity</Text>
+        <View style={styles.activityCard}>
+          <Text style={styles.activityText}>
             No recent rides. Book your first ride to get started!
           </Text>
         </View>
       </View>
 
       {/* Logout Button */}
-      <View className="px-5 pb-10 mt-6">
+      <View style={styles.logoutSection}>
         <TouchableOpacity
-          className="bg-destructive py-3 rounded-lg items-center shadow-elevation"
+          style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text className="text-destructive-foreground text-base font-semibold">Logout</Text>
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  header: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 24,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  welcomeText: {
+    fontSize: 16,
+    color: '#64748b',
+    marginBottom: 8,
+  },
+  userName: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#64748b',
+  },
+  actionsSection: {
+    paddingHorizontal: 20,
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 16,
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  actionCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    borderLeftWidth: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  actionIcon: {
+    fontSize: 28,
+    marginBottom: 12,
+  },
+  actionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  actionSubtitle: {
+    fontSize: 12,
+    color: '#64748b',
+    lineHeight: 16,
+  },
+  activitySection: {
+    paddingHorizontal: 20,
+    marginTop: 24,
+  },
+  activityCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    alignItems: 'center',
+  },
+  activityText: {
+    fontSize: 16,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  logoutSection: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+    marginTop: 24,
+  },
+  logoutButton: {
+    backgroundColor: '#ef4444',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  logoutText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

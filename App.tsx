@@ -4,9 +4,6 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// Import NativeWind CSS
-import 'nativewind';
-
 // Import global styles
 import './src/global.css';
 

@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   TextInput,
+  StyleSheet,
 } from 'react-native';
 
 // Import services and stores
@@ -126,46 +127,46 @@ export default function ProfileScreen() {
   ];
 
   return (
-    <ScrollView className="flex-1 bg-secondary-50">
+    <ScrollView style={styles.container}>
       {/* Profile Header */}
-      <View className="glass mx-5 mt-5 p-6 rounded-2xl border border-glass-border shadow-glass">
-        <View className="flex-row items-center">
-          <View className="w-16 h-16 bg-primary rounded-full justify-center items-center mr-4">
-            <Text className="text-2xl font-bold text-primary-foreground">
+      <View style={styles.profileHeader}>
+        <View style={styles.profileHeaderContent}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
               {user?.full_name?.charAt(0)?.toUpperCase() || 'U'}
             </Text>
           </View>
-          <View className="flex-1">
+          <View style={styles.profileInfo}>
             {isEditing ? (
               <TextInput
-                className="text-xl font-bold text-foreground border border-input rounded-lg px-3 py-2 mb-2 bg-background"
+                style={styles.nameInput}
                 value={editedName}
                 onChangeText={setEditedName}
                 placeholder="Enter your name"
                 autoCapitalize="words"
-                placeholderTextColor="hsl(var(--muted-foreground))"
+                placeholderTextColor="#64748b"
               />
             ) : (
-              <Text className="text-xl font-bold text-foreground mb-1">{user?.full_name || 'Customer'}</Text>
+              <Text style={styles.nameText}>{user?.full_name || 'Customer'}</Text>
             )}
-            <Text className="text-sm text-muted-foreground mb-1">{user?.email}</Text>
+            <Text style={styles.emailText}>{user?.email}</Text>
             {isEditing ? (
               <TextInput
-                className="text-sm text-muted-foreground border border-input rounded-lg px-3 py-2 bg-background"
+                style={styles.phoneInput}
                 value={editedPhone}
                 onChangeText={setEditedPhone}
                 placeholder="Enter phone number"
                 keyboardType="phone-pad"
-                placeholderTextColor="hsl(var(--muted-foreground))"
+                placeholderTextColor="#64748b"
               />
             ) : (
-              <Text className="text-sm text-muted-foreground">
+              <Text style={styles.phoneText}>
                 {user?.phone || 'No phone number'}
               </Text>
             )}
           </View>
           <TouchableOpacity
-            className="bg-primary px-4 py-2 rounded-lg ml-2"
+            style={styles.editButton}
             onPress={() => {
               if (isEditing) {
                 handleSaveProfile();
@@ -174,7 +175,7 @@ export default function ProfileScreen() {
               }
             }}
           >
-            <Text className="text-primary-foreground font-medium text-sm">
+            <Text style={styles.editButtonText}>
               {isEditing ? 'Save' : 'Edit'}
             </Text>
           </TouchableOpacity>
@@ -182,47 +183,258 @@ export default function ProfileScreen() {
       </View>
 
       {/* Stats */}
-      <View className="glass mx-5 mt-5 p-5 rounded-2xl border border-glass-border shadow-elevation">
-        <View className="flex-row justify-around">
+      <View style={styles.statsCard}>
+        <View style={styles.statsContainer}>
           {profileStats.map((stat, index) => (
-            <View key={index} className="items-center">
-              <Text className="text-3xl mb-2">{stat.icon}</Text>
-              <Text className="text-xl font-bold text-foreground mb-1">{stat.value}</Text>
-              <Text className="text-xs text-muted-foreground text-center">{stat.label}</Text>
+            <View key={index} style={styles.statItem}>
+              <Text style={styles.statIcon}>{stat.icon}</Text>
+              <Text style={styles.statValue}>{stat.value}</Text>
+              <Text style={styles.statLabel}>{stat.label}</Text>
             </View>
           ))}
         </View>
       </View>
 
       {/* Menu Items */}
-      <View className="glass mx-5 mt-5 rounded-2xl overflow-hidden border border-glass-border shadow-glass">
+      <View style={styles.menuCard}>
         {menuItems.map((item, index) => (
           <TouchableOpacity
             key={index}
-            className="flex-row items-center justify-between px-5 py-4 border-b border-border"
+            style={styles.menuItem}
             onPress={item.onPress}
           >
-            <View className="flex-row items-center flex-1">
-              <Text className="text-2xl mr-4 w-6 text-center">{item.icon}</Text>
-              <View className="flex-1">
-                <Text className="text-base font-medium text-foreground mb-1">{item.title}</Text>
-                <Text className="text-sm text-muted-foreground">{item.subtitle}</Text>
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuItemIcon}>{item.icon}</Text>
+              <View style={styles.menuItemText}>
+                <Text style={styles.menuItemTitle}>{item.title}</Text>
+                <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
               </View>
             </View>
-            <Text className="text-lg text-muted-foreground">›</Text>
+            <Text style={styles.menuItemArrow}>›</Text>
           </TouchableOpacity>
         ))}
       </View>
 
       {/* Logout Button */}
-      <View className="px-5 py-6 pb-10">
+      <View style={styles.logoutContainer}>
         <TouchableOpacity
-          className="bg-destructive py-3 rounded-lg items-center shadow-elevation"
+          style={styles.logoutButton}
           onPress={handleLogout}
         >
-          <Text className="text-destructive-foreground font-semibold text-base">Logout</Text>
+          <Text style={styles.logoutButtonText}>Logout</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  profileHeader: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 24,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  profileHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  avatar: {
+    width: 64,
+    height: 64,
+    backgroundColor: '#2563eb',
+    borderRadius: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  avatarText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  nameInput: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 8,
+    backgroundColor: '#ffffff',
+  },
+  nameText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  emailText: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 4,
+  },
+  phoneInput: {
+    fontSize: 14,
+    color: '#64748b',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#ffffff',
+  },
+  phoneText: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  editButton: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  editButtonText: {
+    color: '#ffffff',
+    fontWeight: '500',
+    fontSize: 14,
+  },
+  statsCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statIcon: {
+    fontSize: 28,
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  menuCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    marginHorizontal: 20,
+    marginTop: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  menuItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  menuItemIcon: {
+    fontSize: 24,
+    marginRight: 16,
+    width: 24,
+    textAlign: 'center',
+  },
+  menuItemText: {
+    flex: 1,
+  },
+  menuItemTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1e293b',
+    marginBottom: 2,
+  },
+  menuItemSubtitle: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  menuItemArrow: {
+    fontSize: 18,
+    color: '#64748b',
+  },
+  logoutContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    paddingBottom: 40,
+  },
+  logoutButton: {
+    backgroundColor: '#dc2626',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  logoutButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});

@@ -6,6 +6,7 @@ import {
   Modal,
   ScrollView,
   Alert,
+  StyleSheet,
 } from 'react-native';
 import { useAppStore } from '../stores/appStore';
 
@@ -42,13 +43,13 @@ export default function NotificationBell() {
   return (
     <>
       <TouchableOpacity
-        className="relative p-2"
+        style={styles.bellContainer}
         onPress={() => setShowNotifications(true)}
       >
-        <Text className="text-xl">🔔</Text>
+        <Text style={styles.bellIcon}>🔔</Text>
         {unreadCount > 0 && (
-          <View className="absolute -top-1 -right-1 bg-red-500 rounded-full min-w-5 h-5 items-center justify-center">
-            <Text className="text-white text-xs font-bold">
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>
               {unreadCount > 99 ? '99+' : unreadCount}
             </Text>
           </View>
@@ -61,38 +62,38 @@ export default function NotificationBell() {
         animationType="slide"
         onRequestClose={() => setShowNotifications(false)}
       >
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white rounded-t-2xl max-h-96">
-            <View className="flex-row items-center justify-between p-4 border-b border-slate-200">
-              <Text className="text-lg font-semibold text-slate-800">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
                 Notifications ({notifications.length})
               </Text>
-              <View className="flex-row gap-3">
+              <View style={styles.modalActions}>
                 {unreadCount > 0 && (
                   <TouchableOpacity
-                    className="px-3 py-1 bg-slate-100 rounded-lg"
+                    style={styles.clearButton}
                     onPress={handleClearAll}
                   >
-                    <Text className="text-sm text-slate-600">Clear All</Text>
+                    <Text style={styles.clearButtonText}>Clear All</Text>
                   </TouchableOpacity>
                 )}
                 <TouchableOpacity
-                  className="px-3 py-1"
+                  style={styles.closeButton}
                   onPress={() => setShowNotifications(false)}
                 >
-                  <Text className="text-lg">✕</Text>
+                  <Text style={styles.closeButtonText}>✕</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
-            <ScrollView className="max-h-80">
+            <ScrollView style={styles.scrollContainer}>
               {notifications.length === 0 ? (
-                <View className="p-8 items-center">
-                  <Text className="text-4xl mb-4">🔔</Text>
-                  <Text className="text-slate-500 text-center">
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyIcon}>🔔</Text>
+                  <Text style={styles.emptyTitle}>
                     No notifications yet
                   </Text>
-                  <Text className="text-slate-400 text-sm text-center mt-2">
+                  <Text style={styles.emptySubtitle}>
                     You'll receive updates about your bookings here
                   </Text>
                 </View>
@@ -100,35 +101,42 @@ export default function NotificationBell() {
                 notifications.map((notification) => (
                   <TouchableOpacity
                     key={notification.id}
-                    className={`p-4 border-b border-slate-100 ${
-                      !notification.is_read ? 'bg-blue-50' : 'bg-white'
-                    }`}
+                    style={[
+                      styles.notificationItem,
+                      !notification.is_read && styles.notificationItemUnread
+                    ]}
                     onPress={() => handleNotificationPress(notification.id)}
                   >
-                    <View className="flex-row items-start gap-3">
-                      <View className={`w-2 h-2 rounded-full mt-2 ${
-                        notification.type === 'booking' ? 'bg-blue-500' :
-                        notification.type === 'payment' ? 'bg-green-500' :
-                        notification.type === 'system' ? 'bg-yellow-500' :
-                        'bg-purple-500'
-                      }`} />
-                      <View className="flex-1">
-                        <Text className={`font-medium mb-1 ${
-                          !notification.is_read ? 'text-slate-900' : 'text-slate-700'
-                        }`}>
+                    <View style={styles.notificationLeft}>
+                      <View style={[
+                        styles.notificationDot,
+                        {
+                          backgroundColor:
+                            notification.type === 'booking' ? '#2563eb' :
+                            notification.type === 'payment' ? '#16a34a' :
+                            notification.type === 'system' ? '#f59e0b' :
+                            '#a855f7'
+                        }
+                      ]} />
+                      <View style={styles.notificationContent}>
+                        <Text style={[
+                          styles.notificationTitle,
+                          !notification.is_read && styles.notificationTitleUnread
+                        ]}>
                           {notification.title}
                         </Text>
-                        <Text className={`text-sm mb-2 ${
-                          !notification.is_read ? 'text-slate-700' : 'text-slate-500'
-                        }`}>
+                        <Text style={[
+                          styles.notificationMessage,
+                          !notification.is_read && styles.notificationMessageUnread
+                        ]}>
                           {notification.message}
                         </Text>
-                        <Text className="text-xs text-slate-400">
+                        <Text style={styles.notificationTime}>
                           {new Date(notification.created_at).toLocaleString()}
                         </Text>
                       </View>
                       {!notification.is_read && (
-                        <View className="w-2 h-2 bg-blue-500 rounded-full" />
+                        <View style={styles.unreadIndicator} />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -141,3 +149,148 @@ export default function NotificationBell() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  bellContainer: {
+    position: 'relative',
+    padding: 8,
+  },
+  bellIcon: {
+    fontSize: 20,
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: '#dc2626',
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    maxHeight: '60%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  clearButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+  },
+  clearButtonText: {
+    fontSize: 14,
+    color: '#475569',
+  },
+  closeButton: {
+    padding: 6,
+  },
+  closeButtonText: {
+    fontSize: 18,
+  },
+  scrollContainer: {
+    maxHeight: 320,
+  },
+  emptyContainer: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: '#94a3b8',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  notificationItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  notificationItemUnread: {
+    backgroundColor: '#eff6ff',
+  },
+  notificationLeft: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flex: 1,
+    gap: 12,
+  },
+  notificationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 6,
+  },
+  notificationContent: {
+    flex: 1,
+  },
+  notificationTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  notificationTitleUnread: {
+    color: '#1e293b',
+  },
+  notificationMessage: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 4,
+  },
+  notificationMessageUnread: {
+    color: '#475569',
+  },
+  notificationTime: {
+    fontSize: 12,
+    color: '#94a3b8',
+  },
+  unreadIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#2563eb',
+  },
+});

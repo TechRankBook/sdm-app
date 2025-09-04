@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
 import { GOOGLE_MAPS_API_KEY } from '@/constants';
 
@@ -229,7 +229,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   };
 
   return (
-    <View className="relative">
+    <View style={styles.container}>
       <MapView
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
@@ -283,17 +283,17 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
 
       {/* Loading Indicator */}
       {isLoading && (
-        <View className="absolute inset-0 bg-black/20 items-center justify-center">
-          <View className="bg-white p-4 rounded-lg">
-            <Text className="text-slate-800">Calculating route...</Text>
+        <View style={styles.loadingOverlay}>
+          <View style={styles.loadingContainer}>
+            <Text style={styles.loadingText}>Calculating route...</Text>
           </View>
         </View>
       )}
 
       {/* Interactive Mode Indicator */}
       {interactive && (
-        <View className="absolute top-2 left-2 bg-white p-2 rounded-lg shadow-lg">
-          <Text className="text-xs text-slate-600">
+        <View style={styles.interactiveIndicator}>
+          <Text style={styles.interactiveText}>
             Tap map to set {activeMarker === 'pickup' ? 'pickup' : 'drop-off'} location
           </Text>
         </View>
@@ -301,3 +301,48 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    position: 'relative',
+  },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingContainer: {
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 8,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#1e293b',
+  },
+  interactiveIndicator: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: '#ffffff',
+    padding: 8,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  interactiveText: {
+    fontSize: 12,
+    color: '#475569',
+  },
+});

@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -72,29 +73,29 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className="flex-1 bg-background"
+      style={styles.container}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
         keyboardShouldPersistTaps="handled"
-        className="flex-1"
+        style={styles.scrollView}
       >
-        <View className="flex-1 justify-center px-6 py-12">
+        <View style={styles.content}>
           {/* Header */}
-          <View className="items-center mb-8">
-            <Text className="text-3xl font-bold text-foreground mb-2">Welcome Back</Text>
-            <Text className="text-base text-muted-foreground text-center">
+          <View style={styles.header}>
+            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.subtitle}>
               Sign in to your SDM Cab Hailing account
             </Text>
           </View>
 
           {/* Form */}
-          <View className="mb-4">
+          <View style={styles.form}>
             {/* Email Input */}
-            <View className="mb-4">
-              <Text className="text-sm font-medium text-foreground mb-2">Email Address</Text>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email Address</Text>
               <TextInput
-                className="border border-input rounded-lg px-4 py-3 text-base bg-background"
+                style={styles.input}
                 placeholder="Enter your email"
                 value={email}
                 onChangeText={setEmail}
@@ -102,15 +103,15 @@ export default function LoginScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
-                placeholderTextColor="hsl(var(--muted-foreground))"
+                placeholderTextColor="#64748b"
               />
             </View>
 
             {/* Password Input */}
-            <View className="mb-4">
-              <Text className="text-sm font-medium text-foreground mb-2">Password</Text>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Password</Text>
               <TextInput
-                className="border border-input rounded-lg px-4 py-3 text-base bg-background"
+                style={styles.input}
                 placeholder="Enter your password"
                 value={password}
                 onChangeText={setPassword}
@@ -118,36 +119,36 @@ export default function LoginScreen() {
                 autoCapitalize="none"
                 autoCorrect={false}
                 editable={!isLoading}
-                placeholderTextColor="hsl(var(--muted-foreground))"
+                placeholderTextColor="#64748b"
               />
             </View>
 
             {/* Forgot Password */}
             <TouchableOpacity
               onPress={handleForgotPassword}
-              className="self-end mb-6"
+              style={styles.forgotPassword}
               disabled={isLoading}
             >
-              <Text className="text-primary text-sm font-medium">Forgot Password?</Text>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
             </TouchableOpacity>
 
             {/* Login Button */}
             <TouchableOpacity
               onPress={handleLogin}
-              className={`bg-primary py-3 rounded-lg items-center mt-6 ${isLoading ? 'opacity-50' : ''}`}
+              style={[styles.button, isLoading && styles.buttonDisabled]}
               disabled={isLoading}
             >
-              <Text className="text-primary-foreground text-base font-semibold">
+              <Text style={styles.buttonText}>
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Text>
             </TouchableOpacity>
           </View>
 
           {/* Register Link */}
-          <View className="flex-row justify-center items-center mt-8">
-            <Text className="text-muted-foreground">Don't have an account? </Text>
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Don't have an account? </Text>
             <TouchableOpacity onPress={handleRegister} disabled={isLoading}>
-              <Text className="text-primary font-semibold">Sign Up</Text>
+              <Text style={styles.footerLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -155,3 +156,91 @@ export default function LoginScreen() {
     </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 48,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#64748b',
+    textAlign: 'center',
+  },
+  form: {
+    marginBottom: 16,
+  },
+  inputGroup: {
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    backgroundColor: '#ffffff',
+  },
+  forgotPassword: {
+    alignSelf: 'flex-end',
+  },
+  forgotPasswordText: {
+    color: '#2563eb',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  button: {
+    backgroundColor: '#2563eb',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    marginTop: 24,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  footer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 32,
+  },
+  footerText: {
+    color: '#64748b',
+  },
+  footerLink: {
+    color: '#2563eb',
+    fontWeight: '600',
+  },
+});

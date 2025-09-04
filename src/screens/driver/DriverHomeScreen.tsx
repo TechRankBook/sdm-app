@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   Switch,
+  StyleSheet,
 } from 'react-native';
 
 // Import services and stores
@@ -50,38 +51,38 @@ export default function DriverHomeScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-secondary-50">
+    <ScrollView style={styles.container}>
       {/* Online Status */}
-      <View className="glass mx-5 mt-5 p-5 rounded-2xl border border-glass-border shadow-glass">
-        <View className="flex-row justify-between items-center mb-2">
-          <Text className="text-lg font-semibold text-foreground">Driver Status</Text>
+      <View style={styles.statusCard}>
+        <View style={styles.statusHeader}>
+          <Text style={styles.statusTitle}>Driver Status</Text>
           <Switch
             value={isOnline}
             onValueChange={toggleOnlineStatus}
-            trackColor={{ false: 'hsl(var(--muted))', true: 'hsl(var(--primary))' }}
-            thumbColor={isOnline ? 'hsl(var(--primary-foreground))' : 'hsl(var(--muted-foreground))'}
+            trackColor={{ false: '#cbd5e1', true: '#2563eb' }}
+            thumbColor={isOnline ? '#ffffff' : '#f1f5f9'}
           />
         </View>
-        <Text className={`text-sm font-medium ${isOnline ? 'text-green-600' : 'text-red-600'}`}>
+        <Text style={[styles.statusText, isOnline ? styles.onlineText : styles.offlineText]}>
           {isOnline ? 'Online - Accepting rides' : 'Offline - Not accepting rides'}
         </Text>
       </View>
 
       {/* Current Ride */}
       {currentRide && (
-        <View className="glass mx-5 my-5 p-5 rounded-2xl border border-glass-border shadow-glass">
-          <Text className="text-lg font-semibold text-foreground mb-3">Current Ride</Text>
-          <View className="mb-4">
-            <Text className="text-sm text-muted-foreground mb-1">Pickup: {currentRide.pickup}</Text>
-            <Text className="text-sm text-muted-foreground mb-1">Drop: {currentRide.drop}</Text>
-            <Text className="text-sm text-muted-foreground">Fare: ₹{currentRide.fare}</Text>
+        <View style={styles.rideCard}>
+          <Text style={styles.rideTitle}>Current Ride</Text>
+          <View style={styles.rideDetails}>
+            <Text style={styles.rideDetailText}>Pickup: {currentRide.pickup}</Text>
+            <Text style={styles.rideDetailText}>Drop: {currentRide.drop}</Text>
+            <Text style={styles.rideDetailText}>Fare: ₹{currentRide.fare}</Text>
           </View>
-          <View className="flex-row gap-3">
-            <TouchableOpacity className="flex-1 bg-warning py-3 rounded-lg items-center">
-              <Text className="text-warning-foreground text-sm font-semibold">Arrived at Pickup</Text>
+          <View style={styles.rideActions}>
+            <TouchableOpacity style={styles.arrivedButton}>
+              <Text style={styles.arrivedButtonText}>Arrived at Pickup</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="flex-1 bg-success py-3 rounded-lg items-center">
-              <Text className="text-success text-sm font-semibold">Complete Ride</Text>
+            <TouchableOpacity style={styles.completeButton}>
+              <Text style={styles.completeButtonText}>Complete Ride</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -89,80 +90,332 @@ export default function DriverHomeScreen() {
 
       {/* Available Ride Request */}
       {isOnline && !currentRide && (
-        <View className="glass mx-5 my-5 p-5 rounded-2xl border-2 border-primary shadow-glass">
-          <Text className="text-lg font-semibold text-foreground mb-3">🚗 New Ride Request</Text>
-          <View className="mb-4">
-            <Text className="text-sm text-muted-foreground mb-1">Distance: 2.5 km</Text>
-            <Text className="text-sm text-muted-foreground mb-1">Fare: ₹180</Text>
-            <Text className="text-sm text-muted-foreground mb-1">Pickup: Connaught Place</Text>
-            <Text className="text-sm text-muted-foreground">Drop: Karol Bagh</Text>
+        <View style={styles.requestCard}>
+          <Text style={styles.requestTitle}>🚗 New Ride Request</Text>
+          <View style={styles.requestDetails}>
+            <Text style={styles.requestDetailText}>Distance: 2.5 km</Text>
+            <Text style={styles.requestDetailText}>Fare: ₹180</Text>
+            <Text style={styles.requestDetailText}>Pickup: Connaught Place</Text>
+            <Text style={styles.requestDetailText}>Drop: Karol Bagh</Text>
           </View>
-          <View className="flex-row gap-3">
+          <View style={styles.requestActions}>
             <TouchableOpacity
-              className="flex-1 bg-destructive py-3 rounded-lg items-center"
+              style={styles.rejectButton}
               onPress={handleRejectRide}
             >
-              <Text className="text-destructive-foreground text-sm font-semibold">Reject</Text>
+              <Text style={styles.rejectButtonText}>Reject</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="flex-1 bg-success py-3 rounded-lg items-center"
+              style={styles.acceptButton}
               onPress={handleAcceptRide}
             >
-              <Text className="text-success text-sm font-semibold">Accept</Text>
+              <Text style={styles.acceptButtonText}>Accept</Text>
             </TouchableOpacity>
           </View>
         </View>
       )}
 
       {/* Stats */}
-      <View className="px-5 mb-5">
-        <Text className="text-xl font-semibold text-foreground mb-4">Today's Summary</Text>
-        <View className="flex-row flex-wrap gap-3">
-          <View className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-3xl mb-2">💰</Text>
-            <Text className="text-xl font-bold text-foreground mb-1">₹{stats.todayEarnings}</Text>
-            <Text className="text-xs text-muted-foreground">Earnings</Text>
+      <View style={styles.statsSection}>
+        <Text style={styles.statsTitle}>Today's Summary</Text>
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <Text style={styles.statIcon}>💰</Text>
+            <Text style={styles.statValue}>₹{stats.todayEarnings}</Text>
+            <Text style={styles.statLabel}>Earnings</Text>
           </View>
-          <View className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-3xl mb-2">🚗</Text>
-            <Text className="text-xl font-bold text-foreground mb-1">{stats.todayRides}</Text>
-            <Text className="text-xs text-muted-foreground">Rides</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statIcon}>🚗</Text>
+            <Text style={styles.statValue}>{stats.todayRides}</Text>
+            <Text style={styles.statLabel}>Rides</Text>
           </View>
-          <View className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-3xl mb-2">⭐</Text>
-            <Text className="text-xl font-bold text-foreground mb-1">{stats.rating}</Text>
-            <Text className="text-xs text-muted-foreground">Rating</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statIcon}>⭐</Text>
+            <Text style={styles.statValue}>{stats.rating}</Text>
+            <Text style={styles.statLabel}>Rating</Text>
           </View>
-          <View className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-3xl mb-2">📊</Text>
-            <Text className="text-xl font-bold text-foreground mb-1">{stats.totalRides}</Text>
-            <Text className="text-xs text-muted-foreground">Total</Text>
+          <View style={styles.statCard}>
+            <Text style={styles.statIcon}>📊</Text>
+            <Text style={styles.statValue}>{stats.totalRides}</Text>
+            <Text style={styles.statLabel}>Total</Text>
           </View>
         </View>
       </View>
 
       {/* Quick Actions */}
-      <View className="px-5 pb-10">
-        <Text className="text-xl font-semibold text-foreground mb-4">Quick Actions</Text>
-        <View className="flex-row flex-wrap gap-3">
-          <TouchableOpacity className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-2xl mb-2">📍</Text>
-            <Text className="text-sm font-medium text-muted-foreground">Update Location</Text>
+      <View style={styles.actionsSection}>
+        <Text style={styles.actionsTitle}>Quick Actions</Text>
+        <View style={styles.actionsGrid}>
+          <TouchableOpacity style={styles.actionCard}>
+            <Text style={styles.actionIcon}>📍</Text>
+            <Text style={styles.actionText}>Update Location</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-2xl mb-2">📞</Text>
-            <Text className="text-sm font-medium text-muted-foreground">Emergency</Text>
+          <TouchableOpacity style={styles.actionCard}>
+            <Text style={styles.actionIcon}>📞</Text>
+            <Text style={styles.actionText}>Emergency</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-2xl mb-2">⚙️</Text>
-            <Text className="text-sm font-medium text-muted-foreground">Settings</Text>
+          <TouchableOpacity style={styles.actionCard}>
+            <Text style={styles.actionIcon}>⚙️</Text>
+            <Text style={styles.actionText}>Settings</Text>
           </TouchableOpacity>
-          <TouchableOpacity className="flex-1 min-w-[45%] glass p-4 rounded-xl items-center border border-glass-border shadow-elevation">
-            <Text className="text-2xl mb-2">📈</Text>
-            <Text className="text-sm font-medium text-muted-foreground">Analytics</Text>
+          <TouchableOpacity style={styles.actionCard}>
+            <Text style={styles.actionIcon}>📈</Text>
+            <Text style={styles.actionText}>Analytics</Text>
           </TouchableOpacity>
         </View>
       </View>
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  statusCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginTop: 20,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  statusHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statusTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  statusText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  onlineText: {
+    color: '#10b981',
+  },
+  offlineText: {
+    color: '#ef4444',
+  },
+  rideCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginVertical: 20,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  rideTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 12,
+  },
+  rideDetails: {
+    marginBottom: 16,
+  },
+  rideDetailText: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 4,
+  },
+  rideActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  arrivedButton: {
+    flex: 1,
+    backgroundColor: '#f59e0b',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  arrivedButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  completeButton: {
+    flex: 1,
+    backgroundColor: '#10b981',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  completeButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  requestCard: {
+    backgroundColor: '#ffffff',
+    marginHorizontal: 20,
+    marginVertical: 20,
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: '#2563eb',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  requestTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 12,
+  },
+  requestDetails: {
+    marginBottom: 16,
+  },
+  requestDetailText: {
+    fontSize: 14,
+    color: '#64748b',
+    marginBottom: 4,
+  },
+  requestActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  rejectButton: {
+    flex: 1,
+    backgroundColor: '#ef4444',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  rejectButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  acceptButton: {
+    flex: 1,
+    backgroundColor: '#10b981',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  acceptButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  statsSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  statsTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 16,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  statIcon: {
+    fontSize: 28,
+    marginBottom: 8,
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  actionsSection: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
+  actionsTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 16,
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  actionCard: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  actionIcon: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#64748b',
+  },
+});

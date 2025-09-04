@@ -8,6 +8,7 @@ import {
   TextInput,
   Switch,
   Modal,
+  StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -240,23 +241,29 @@ export default function BookRideScreen() {
   }, [isFormValid, serviceType, pickupLocation, dropoffLocation, passengers, vehicleType, isRoundTrip, tripType, specialInstructions, pickupCoords, dropoffCoords, routeData, scheduledDate, scheduledTime, returnDate, returnTime, navigation]);
 
   return (
-    <ScrollView className="flex-1 bg-secondary-50">
+    <ScrollView
+      style={styles.container}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
       {/* Service Type Selection */}
-      <View className="p-5">
-        <Text className="text-xl font-semibold text-foreground mb-4">Book Your Ride</Text>
-        <View className="flex-row flex-wrap gap-3 p-1 glass rounded-2xl border border-glass-border">
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Book Your Ride</Text>
+        <View style={styles.serviceTypeContainer}>
           {serviceTypes.map((service) => (
             <TouchableOpacity
               key={service.id}
-              className={`flex-1 min-w-[45%] p-3 rounded-xl items-center ${
-                serviceType === service.id ? 'bg-primary' : 'bg-secondary-50'
-              }`}
+              style={[
+                styles.serviceTypeButton,
+                serviceType === service.id && styles.serviceTypeButtonActive
+              ]}
               onPress={() => setServiceType(service.id as ServiceType)}
             >
-              <Text className="text-2xl mb-2">{service.icon}</Text>
-              <Text className={`text-sm font-medium text-center ${
-                serviceType === service.id ? 'text-primary-foreground' : 'text-secondary-700'
-              }`}>
+              <Text style={styles.serviceIcon}>{service.icon}</Text>
+              <Text style={[
+                styles.serviceText,
+                serviceType === service.id && styles.serviceTextActive
+              ]}>
                 {service.name}
               </Text>
             </TouchableOpacity>
@@ -266,37 +273,41 @@ export default function BookRideScreen() {
 
       {/* Trip Type for Outstation and Airport */}
       {(serviceType === 'outstation' || serviceType === 'airport') && (
-        <View className="px-5 mb-5">
-          <View className="flex-row p-1 bg-white rounded-xl">
+        <View style={styles.tripTypeSection}>
+          <View style={styles.tripTypeContainer}>
             {serviceType === 'outstation' ? (
               <>
                 <TouchableOpacity
-                  className={`flex-1 p-3 rounded-lg items-center ${
-                    tripType === 'oneway' ? 'bg-blue-600' : 'bg-slate-50'
-                  }`}
+                  style={[
+                    styles.tripTypeButton,
+                    tripType === 'oneway' && styles.tripTypeButtonActive
+                  ]}
                   onPress={() => {
                     setTripType('oneway');
                     setIsRoundTrip(false);
                   }}
                 >
-                  <Text className={`text-sm font-medium ${
-                    tripType === 'oneway' ? 'text-white' : 'text-slate-700'
-                  }`}>
+                  <Text style={[
+                    styles.tripTypeText,
+                    tripType === 'oneway' && styles.tripTypeTextActive
+                  ]}>
                     One Way
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className={`flex-1 p-3 rounded-lg items-center ${
-                    tripType === 'roundtrip' ? 'bg-blue-600' : 'bg-slate-50'
-                  }`}
+                  style={[
+                    styles.tripTypeButton,
+                    tripType === 'roundtrip' && styles.tripTypeButtonActive
+                  ]}
                   onPress={() => {
                     setTripType('roundtrip');
                     setIsRoundTrip(true);
                   }}
                 >
-                  <Text className={`text-sm font-medium ${
-                    tripType === 'roundtrip' ? 'text-white' : 'text-slate-700'
-                  }`}>
+                  <Text style={[
+                    styles.tripTypeText,
+                    tripType === 'roundtrip' && styles.tripTypeTextActive
+                  ]}>
                     Round Trip
                   </Text>
                 </TouchableOpacity>
@@ -304,26 +315,30 @@ export default function BookRideScreen() {
             ) : (
               <>
                 <TouchableOpacity
-                  className={`flex-1 p-3 rounded-lg items-center ${
-                    tripType === 'pickup' ? 'bg-blue-600' : 'bg-slate-50'
-                  }`}
+                  style={[
+                    styles.tripTypeButton,
+                    tripType === 'pickup' && styles.tripTypeButtonActive
+                  ]}
                   onPress={() => setTripType('pickup')}
                 >
-                  <Text className={`text-sm font-medium ${
-                    tripType === 'pickup' ? 'text-white' : 'text-slate-700'
-                  }`}>
+                  <Text style={[
+                    styles.tripTypeText,
+                    tripType === 'pickup' && styles.tripTypeTextActive
+                  ]}>
                     Pick-up
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className={`flex-1 p-3 rounded-lg items-center ${
-                    tripType === 'drop' ? 'bg-blue-600' : 'bg-slate-50'
-                  }`}
+                  style={[
+                    styles.tripTypeButton,
+                    tripType === 'drop' && styles.tripTypeButtonActive
+                  ]}
                   onPress={() => setTripType('drop')}
                 >
-                  <Text className={`text-sm font-medium ${
-                    tripType === 'drop' ? 'text-white' : 'text-slate-700'
-                  }`}>
+                  <Text style={[
+                    styles.tripTypeText,
+                    tripType === 'drop' && styles.tripTypeTextActive
+                  ]}>
                     Drop-off
                   </Text>
                 </TouchableOpacity>
@@ -333,8 +348,8 @@ export default function BookRideScreen() {
 
           {/* Round Trip Toggle for Airport */}
           {serviceType === 'airport' && (
-            <View className="mt-4 flex-row items-center justify-between p-3 bg-white rounded-lg">
-              <Text className="text-sm font-medium text-slate-700">Round Trip</Text>
+            <View style={styles.roundTripToggle}>
+              <Text style={styles.roundTripText}>Round Trip</Text>
               <Switch
                 value={isRoundTrip}
                 onValueChange={setIsRoundTrip}
@@ -347,19 +362,19 @@ export default function BookRideScreen() {
       )}
 
       {/* Location Selection */}
-      <View className="px-5 mb-5">
+      <View style={styles.locationSection}>
         {/* Pickup Location */}
-        <View className="mb-4">
-          <Text className="text-sm font-medium text-slate-700 mb-2">
+        <View style={styles.locationField}>
+          <Text style={styles.locationLabel}>
             {serviceType === 'airport' && tripType === 'pickup' ? 'Select Terminal' : 'Pickup Location'}
           </Text>
 
           {serviceType === 'airport' && tripType === 'pickup' ? (
-            <View className="flex-row gap-3">
+            <View style={styles.terminalContainer}>
               {Object.entries(airportTerminals).map(([key, terminal]) => (
                 <TouchableOpacity
                   key={key}
-                  className="flex-1 p-3 bg-white rounded-lg border-2 border-slate-200"
+                  style={styles.terminalButton}
                   onPress={() => {
                     setPickupLocation(terminal.address);
                     setPickupCoords({
@@ -368,7 +383,7 @@ export default function BookRideScreen() {
                     setPickupLocationError('');
                   }}
                 >
-                  <Text className="text-sm font-medium text-center">{terminal.name}</Text>
+                  <Text style={styles.terminalText}>{terminal.name}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -407,23 +422,23 @@ export default function BookRideScreen() {
           )}
 
           {pickupLocationError ? (
-            <Text className="text-xs text-red-600 mt-1">{pickupLocationError}</Text>
+            <Text style={styles.errorText}>{pickupLocationError}</Text>
           ) : null}
         </View>
 
         {/* Dropoff Location */}
         {serviceType !== 'hourly' && (
-          <View className="mb-4">
-            <Text className="text-sm font-medium text-slate-700 mb-2">
+          <View style={styles.locationField}>
+            <Text style={styles.locationLabel}>
               {serviceType === 'airport' && tripType === 'drop' ? 'Select Terminal' : 'Drop Location'}
             </Text>
 
             {serviceType === 'airport' && tripType === 'drop' ? (
-              <View className="flex-row gap-3">
+              <View style={styles.terminalContainer}>
                 {Object.entries(airportTerminals).map(([key, terminal]) => (
                   <TouchableOpacity
                     key={key}
-                    className="flex-1 p-3 bg-white rounded-lg border-2 border-slate-200"
+                    style={styles.terminalButton}
                     onPress={() => {
                       setDropoffLocation(terminal.address);
                       setDropoffCoords({
@@ -432,7 +447,7 @@ export default function BookRideScreen() {
                       setDropoffLocationError('');
                     }}
                   >
-                    <Text className="text-sm font-medium text-center">{terminal.name}</Text>
+                    <Text style={styles.terminalText}>{terminal.name}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -470,50 +485,54 @@ export default function BookRideScreen() {
             )}
 
             {dropoffLocationError ? (
-              <Text className="text-xs text-red-600 mt-1">{dropoffLocationError}</Text>
+              <Text style={styles.errorText}>{dropoffLocationError}</Text>
             ) : null}
           </View>
         )}
 
         {/* Map Toggle */}
-        <View className="mb-4">
+        <View style={styles.mapToggle}>
           <TouchableOpacity
-            className="flex-row items-center justify-between p-3 bg-white rounded-lg border border-slate-200"
+            style={styles.mapToggleButton}
             onPress={() => setShowMap(!showMap)}
           >
-            <View className="flex-row items-center">
-              <Text className="text-lg mr-2">🗺️</Text>
-              <Text className="text-sm font-medium text-slate-700">View on Map</Text>
+            <View style={styles.mapToggleContent}>
+              <Text style={styles.mapIcon}>🗺️</Text>
+              <Text style={styles.mapToggleText}>View on Map</Text>
             </View>
-            <Text className="text-lg">{showMap ? '−' : '+'}</Text>
+            <Text style={styles.mapToggleIcon}>{showMap ? '−' : '+'}</Text>
           </TouchableOpacity>
         </View>
 
         {/* Interactive Map */}
         {showMap && (
-          <View className="mb-6">
-            <View className="flex-row p-1 bg-white rounded-lg mb-3">
+          <View style={styles.mapContainer}>
+            <View style={styles.mapMarkerContainer}>
               <TouchableOpacity
-                className={`flex-1 p-2 rounded-md items-center ${
-                  activeMapMarker === 'pickup' ? 'bg-blue-600' : 'bg-slate-50'
-                }`}
+                style={[
+                  styles.mapMarkerButton,
+                  activeMapMarker === 'pickup' && styles.mapMarkerButtonActive
+                ]}
                 onPress={() => setActiveMapMarker('pickup')}
               >
-                <Text className={`text-sm font-medium ${
-                  activeMapMarker === 'pickup' ? 'text-white' : 'text-slate-700'
-                }`}>
+                <Text style={[
+                  styles.mapMarkerText,
+                  activeMapMarker === 'pickup' && styles.mapMarkerTextActive
+                ]}>
                   Set Pickup
                 </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className={`flex-1 p-2 rounded-md items-center ${
-                  activeMapMarker === 'dropoff' ? 'bg-blue-600' : 'bg-slate-50'
-                }`}
+                style={[
+                  styles.mapMarkerButton,
+                  activeMapMarker === 'dropoff' && styles.mapMarkerButtonActive
+                ]}
                 onPress={() => setActiveMapMarker('dropoff')}
               >
-                <Text className={`text-sm font-medium ${
-                  activeMapMarker === 'dropoff' ? 'text-white' : 'text-slate-700'
-                }`}>
+                <Text style={[
+                  styles.mapMarkerText,
+                  activeMapMarker === 'dropoff' && styles.mapMarkerTextActive
+                ]}>
                   Set Drop-off
                 </Text>
               </TouchableOpacity>
@@ -553,51 +572,51 @@ export default function BookRideScreen() {
         )}
 
         {/* Date & Time Selection */}
-        <View className="flex-row gap-3 mb-4">
+        <View style={styles.dateTimeContainer}>
           <TouchableOpacity
-            className="flex-1 bg-white p-4 rounded-lg border border-slate-200"
+            style={styles.dateTimeButton}
             onPress={() => setShowDateTimeModal(true)}
           >
-            <Text className="text-sm text-slate-500">Select Date</Text>
-            <Text className="text-base font-medium text-slate-800">
+            <Text style={styles.dateTimeLabel}>Select Date</Text>
+            <Text style={styles.dateTimeValue}>
               {scheduledDate ? scheduledDate.toLocaleDateString() : 'Choose date'}
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            className="flex-1 bg-white p-4 rounded-lg border border-slate-200"
+            style={styles.dateTimeButton}
             onPress={() => setShowDateTimeModal(true)}
           >
-            <Text className="text-sm text-slate-500">Select Time</Text>
-            <Text className="text-base font-medium text-slate-800">
+            <Text style={styles.dateTimeLabel}>Select Time</Text>
+            <Text style={styles.dateTimeValue}>
               {scheduledTime || 'Choose time'}
             </Text>
           </TouchableOpacity>
         </View>
 
         {dateTimeError ? (
-          <Text className="text-xs text-red-600 mb-4">{dateTimeError}</Text>
+          <Text style={styles.errorText}>{dateTimeError}</Text>
         ) : null}
 
         {/* Return Date & Time for Round Trip */}
         {isRoundTrip && (
-          <View className="flex-row gap-3 mb-4">
+          <View style={styles.dateTimeContainer}>
             <TouchableOpacity
-              className="flex-1 bg-white p-4 rounded-lg border border-slate-200"
+              style={styles.dateTimeButton}
               onPress={() => setShowDateTimeModal(true)}
             >
-              <Text className="text-sm text-slate-500">Return Date</Text>
-              <Text className="text-base font-medium text-slate-800">
+              <Text style={styles.dateTimeLabel}>Return Date</Text>
+              <Text style={styles.dateTimeValue}>
                 {returnDate ? returnDate.toLocaleDateString() : 'Choose date'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="flex-1 bg-white p-4 rounded-lg border border-slate-200"
+              style={styles.dateTimeButton}
               onPress={() => setShowDateTimeModal(true)}
             >
-              <Text className="text-sm text-slate-500">Return Time</Text>
-              <Text className="text-base font-medium text-slate-800">
+              <Text style={styles.dateTimeLabel}>Return Time</Text>
+              <Text style={styles.dateTimeValue}>
                 {returnTime || 'Choose time'}
               </Text>
             </TouchableOpacity>
@@ -606,76 +625,76 @@ export default function BookRideScreen() {
 
         {/* Passenger Selection */}
         <TouchableOpacity
-          className="bg-white p-4 rounded-lg border border-slate-200 mb-4"
+          style={styles.passengerButton}
           onPress={() => setShowGuestModal(true)}
         >
-          <Text className="text-sm text-slate-500">Passengers</Text>
-          <Text className="text-base font-medium text-slate-800">
+          <Text style={styles.passengerLabel}>Passengers</Text>
+          <Text style={styles.passengerValue}>
             {passengers} Guest{passengers !== 1 ? 's' : ''}
           </Text>
         </TouchableOpacity>
 
         {/* Vehicle Type Selection */}
-        <View className="mb-4">
-          <Text className="text-sm font-medium text-slate-700 mb-3">Vehicle Type</Text>
-          <View className="flex-row gap-3">
+        <View style={styles.vehicleSection}>
+          <Text style={styles.vehicleLabel}>Vehicle Type</Text>
+          <View style={styles.vehicleContainer}>
             {vehicleTypes.map((vehicle) => (
               <TouchableOpacity
                 key={vehicle.type}
-                className={`flex-1 p-3 rounded-lg items-center border-2 ${
-                  vehicleType === vehicle.type
-                    ? 'border-blue-600 bg-blue-50'
-                    : 'border-slate-200 bg-white'
-                }`}
+                style={[
+                  styles.vehicleButton,
+                  vehicleType === vehicle.type && styles.vehicleButtonActive
+                ]}
                 onPress={() => setVehicleType(vehicle.type as VehicleType)}
               >
-                <Text className="text-xl mb-1">{vehicle.icon}</Text>
-                <Text className={`text-sm font-medium ${
-                  vehicleType === vehicle.type ? 'text-blue-600' : 'text-slate-700'
-                }`}>
+                <Text style={styles.vehicleIcon}>{vehicle.icon}</Text>
+                <Text style={[
+                  styles.vehicleName,
+                  vehicleType === vehicle.type && styles.vehicleNameActive
+                ]}>
                   {vehicle.label}
                 </Text>
-                <Text className="text-xs text-slate-500">{vehicle.capacity}</Text>
+                <Text style={styles.vehicleCapacity}>{vehicle.capacity}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
 
         {/* Special Instructions */}
-        <View className="mb-4">
+        <View style={styles.specialInstructionsSection}>
           <TouchableOpacity
-            className="flex-row items-center justify-between p-3 bg-white rounded-lg border border-slate-200"
+            style={styles.specialInstructionsToggle}
             onPress={() => setShowSpecialInstructions(!showSpecialInstructions)}
           >
-            <Text className="text-sm font-medium text-slate-700">Special Instructions</Text>
-            <Text className="text-lg">{showSpecialInstructions ? '−' : '+'}</Text>
+            <Text style={styles.specialInstructionsLabel}>Special Instructions</Text>
+            <Text style={styles.specialInstructionsIcon}>{showSpecialInstructions ? '−' : '+'}</Text>
           </TouchableOpacity>
 
           {showSpecialInstructions && (
-            <View className="mt-3 p-4 bg-white rounded-lg border border-slate-200">
+            <View style={styles.specialInstructionsContent}>
               {/* Luggage */}
-              <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-sm text-slate-700">Luggage Items</Text>
-                <View className="flex-row items-center gap-3">
+              <View style={styles.specialInstructionsRow}>
+                <Text style={styles.specialInstructionsText}>Luggage Items</Text>
+                <View style={styles.counterContainer}>
                   <TouchableOpacity
-                    className="w-8 h-8 bg-slate-200 rounded-full items-center justify-center"
+                    style={styles.counterButton}
                     onPress={() => setLuggageCount(Math.max(0, luggageCount - 1))}
                   >
-                    <Text className="text-lg font-bold">−</Text>
+                    <Text style={styles.counterButtonText}>−</Text>
                   </TouchableOpacity>
-                  <Text className="w-8 text-center">{luggageCount}</Text>
+                  <Text style={styles.counterValue}>{luggageCount}</Text>
                   <TouchableOpacity
-                    className="w-8 h-8 bg-slate-200 rounded-full items-center justify-center"
+                    style={styles.counterButton}
                     onPress={() => setLuggageCount(Math.min(3, luggageCount + 1))}
                   >
-                    <Text className="text-lg font-bold">+</Text>
+                    <Text style={styles.counterButtonText}>+</Text>
                   </TouchableOpacity>
                 </View>
               </View>
 
               {/* Pet */}
-              <View className="flex-row items-center justify-between mb-4">
-                <Text className="text-sm text-slate-700">Traveling with Pet</Text>
+              <View style={styles.specialInstructionsRow}>
+                <Text style={styles.specialInstructionsText}>Traveling with Pet</Text>
                 <Switch
                   value={hasPet}
                   onValueChange={setHasPet}
@@ -686,7 +705,7 @@ export default function BookRideScreen() {
 
               {/* Additional Instructions */}
               <TextInput
-                className="p-3 bg-slate-50 rounded-lg border border-slate-200"
+                style={styles.additionalInstructionsInput}
                 placeholder="Any additional requirements..."
                 value={additionalInstructions}
                 onChangeText={setAdditionalInstructions}
@@ -699,26 +718,26 @@ export default function BookRideScreen() {
 
         {/* Fare Display */}
         {fareData && routeData && (
-          <View className="bg-white p-4 rounded-lg border border-slate-200 mb-4">
-            <View className="flex-row items-center justify-between mb-2">
-              <Text className="text-lg font-semibold text-slate-800">Estimated Fare</Text>
+          <View style={styles.fareDisplay}>
+            <View style={styles.fareHeader}>
+              <Text style={styles.fareTitle}>Estimated Fare</Text>
               {fareData.surgeMultiplier > 1 && (
-                <View className="bg-orange-100 px-2 py-1 rounded">
-                  <Text className="text-xs font-medium text-orange-800">
+                <View style={styles.surgeBadge}>
+                  <Text style={styles.surgeText}>
                     {((fareData.surgeMultiplier - 1) * 100).toFixed(0)}% Surge
                   </Text>
                 </View>
               )}
             </View>
-            <Text className="text-2xl font-bold text-green-600">₹{fareData.totalFare}</Text>
-            <Text className="text-xs text-slate-500 mt-1">
+            <Text style={styles.fareAmount}>₹{fareData.totalFare}</Text>
+            <Text style={styles.fareBreakdown}>
               Base: ₹{fareData.baseFare} | Distance: ₹{fareData.distanceFare} | Time: ₹{fareData.timeFare}
             </Text>
-            <Text className="text-xs text-slate-400 mt-1">
+            <Text style={styles.fareDetails}>
               Distance: {routeData.distance} | Duration: {routeData.duration}
             </Text>
             {fareData.surgeReason && (
-              <Text className="text-xs text-orange-600 mt-1">
+              <Text style={styles.surgeReason}>
                 Surge: {fareData.surgeReason}
               </Text>
             )}
@@ -727,15 +746,17 @@ export default function BookRideScreen() {
 
         {/* Search Cars Button */}
         <TouchableOpacity
-          className={`py-4 rounded-lg items-center mb-6 ${
-            isFormValid() ? 'bg-blue-600' : 'bg-slate-300'
-          }`}
+          style={[
+            styles.searchButton,
+            isFormValid() && styles.searchButtonActive
+          ]}
           onPress={handleSearchCars}
           disabled={!isFormValid()}
         >
-          <Text className={`text-base font-semibold ${
-            isFormValid() ? 'text-white' : 'text-slate-500'
-          }`}>
+          <Text style={[
+            styles.searchButtonText,
+            isFormValid() && styles.searchButtonTextActive
+          ]}>
             {isFormValid() ? 'Search Cars' : 'Complete Form'}
           </Text>
         </TouchableOpacity>
@@ -743,34 +764,34 @@ export default function BookRideScreen() {
 
       {/* Guest Modal */}
       <Modal visible={showGuestModal} transparent animationType="slide">
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white p-6 rounded-t-2xl">
-            <Text className="text-lg font-semibold text-slate-800 mb-4">Select Passengers</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Passengers</Text>
 
-            <View className="flex-row items-center justify-between mb-6">
-              <Text className="text-base text-slate-700">Passengers</Text>
-              <View className="flex-row items-center gap-4">
+            <View style={styles.modalRow}>
+              <Text style={styles.modalLabel}>Passengers</Text>
+              <View style={styles.modalCounter}>
                 <TouchableOpacity
-                  className="w-10 h-10 bg-slate-200 rounded-full items-center justify-center"
+                  style={styles.modalCounterButton}
                   onPress={() => setPassengers(Math.max(1, passengers - 1))}
                 >
-                  <Text className="text-xl font-bold">−</Text>
+                  <Text style={styles.modalCounterText}>−</Text>
                 </TouchableOpacity>
-                <Text className="text-lg font-semibold w-8 text-center">{passengers}</Text>
+                <Text style={styles.modalCounterValue}>{passengers}</Text>
                 <TouchableOpacity
-                  className="w-10 h-10 bg-slate-200 rounded-full items-center justify-center"
+                  style={styles.modalCounterButton}
                   onPress={() => setPassengers(Math.min(6, passengers + 1))}
                 >
-                  <Text className="text-xl font-bold">+</Text>
+                  <Text style={styles.modalCounterText}>+</Text>
                 </TouchableOpacity>
               </View>
             </View>
 
             <TouchableOpacity
-              className="bg-blue-600 py-3 rounded-lg items-center"
+              style={styles.modalButton}
               onPress={() => setShowGuestModal(false)}
             >
-              <Text className="text-base font-semibold text-white">Done</Text>
+              <Text style={styles.modalButtonText}>Done</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -778,13 +799,13 @@ export default function BookRideScreen() {
 
       {/* Date Time Modal - Simplified for now */}
       <Modal visible={showDateTimeModal} transparent animationType="slide">
-        <View className="flex-1 justify-end bg-black/50">
-          <View className="bg-white p-6 rounded-t-2xl">
-            <Text className="text-lg font-semibold text-slate-800 mb-4">Select Date & Time</Text>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Select Date & Time</Text>
 
             {/* This would be replaced with proper date/time pickers */}
             <TouchableOpacity
-              className="bg-blue-600 py-3 rounded-lg items-center mb-4"
+              style={[styles.modalButton, { marginBottom: 16 }]}
               onPress={() => {
                 const now = new Date();
                 now.setHours(now.getHours() + 1);
@@ -793,14 +814,14 @@ export default function BookRideScreen() {
                 setShowDateTimeModal(false);
               }}
             >
-              <Text className="text-base font-semibold text-white">Schedule for 1 hour later</Text>
+              <Text style={styles.modalButtonText}>Schedule for 1 hour later</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              className="bg-slate-200 py-3 rounded-lg items-center"
+              style={styles.modalCancelButton}
               onPress={() => setShowDateTimeModal(false)}
             >
-              <Text className="text-base font-semibold text-slate-700">Cancel</Text>
+              <Text style={styles.modalCancelText}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -808,3 +829,485 @@ export default function BookRideScreen() {
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  section: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 16,
+  },
+  serviceTypeContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    padding: 4,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  serviceTypeButton: {
+    flex: 1,
+    minWidth: '45%',
+    padding: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    backgroundColor: '#f8fafc',
+  },
+  serviceTypeButtonActive: {
+    backgroundColor: '#2563eb',
+  },
+  serviceIcon: {
+    fontSize: 24,
+    marginBottom: 8,
+  },
+  serviceText: {
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+    color: '#475569',
+  },
+  serviceTextActive: {
+    color: '#ffffff',
+  },
+  tripTypeSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  tripTypeContainer: {
+    flexDirection: 'row',
+    padding: 4,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+  },
+  tripTypeButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    backgroundColor: '#f1f5f9',
+  },
+  tripTypeButtonActive: {
+    backgroundColor: '#2563eb',
+  },
+  tripTypeText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  tripTypeTextActive: {
+    color: '#ffffff',
+  },
+  roundTripToggle: {
+    marginTop: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+  },
+  roundTripText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  locationSection: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  locationField: {
+    marginBottom: 16,
+  },
+  locationLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+    marginBottom: 8,
+  },
+  terminalContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  terminalButton: {
+    flex: 1,
+    padding: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+  },
+  terminalText: {
+    fontSize: 14,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#dc2626',
+    marginTop: 4,
+  },
+  mapToggle: {
+    marginBottom: 16,
+  },
+  mapToggleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  mapToggleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  mapIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  mapToggleText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  mapToggleIcon: {
+    fontSize: 18,
+  },
+  mapContainer: {
+    marginBottom: 24,
+  },
+  mapMarkerContainer: {
+    flexDirection: 'row',
+    padding: 4,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  mapMarkerButton: {
+    flex: 1,
+    padding: 8,
+    borderRadius: 6,
+    alignItems: 'center',
+    backgroundColor: '#f1f5f9',
+  },
+  mapMarkerButtonActive: {
+    backgroundColor: '#2563eb',
+  },
+  mapMarkerText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  mapMarkerTextActive: {
+    color: '#ffffff',
+  },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  dateTimeButton: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  dateTimeLabel: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  dateTimeValue: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1e293b',
+    marginTop: 4,
+  },
+  passengerButton: {
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    marginBottom: 16,
+  },
+  passengerLabel: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  passengerValue: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#1e293b',
+    marginTop: 4,
+  },
+  vehicleSection: {
+    marginBottom: 16,
+  },
+  vehicleLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+    marginBottom: 12,
+  },
+  vehicleContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  vehicleButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    backgroundColor: '#ffffff',
+  },
+  vehicleButtonActive: {
+    borderColor: '#2563eb',
+    backgroundColor: '#eff6ff',
+  },
+  vehicleIcon: {
+    fontSize: 20,
+    marginBottom: 4,
+  },
+  vehicleName: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  vehicleNameActive: {
+    color: '#2563eb',
+  },
+  vehicleCapacity: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  specialInstructionsSection: {
+    marginBottom: 16,
+  },
+  specialInstructionsToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  specialInstructionsLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  specialInstructionsIcon: {
+    fontSize: 18,
+  },
+  specialInstructionsContent: {
+    marginTop: 12,
+    padding: 16,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  specialInstructionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  specialInstructionsText: {
+    fontSize: 14,
+    color: '#475569',
+  },
+  counterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  counterButton: {
+    width: 32,
+    height: 32,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  counterButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  counterValue: {
+    width: 32,
+    textAlign: 'center',
+  },
+  additionalInstructionsInput: {
+    padding: 12,
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
+  fareDisplay: {
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    marginBottom: 16,
+  },
+  fareHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  fareTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
+  surgeBadge: {
+    backgroundColor: '#fed7aa',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+  },
+  surgeText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#ea580c',
+  },
+  fareAmount: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#16a34a',
+  },
+  fareBreakdown: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 4,
+  },
+  fareDetails: {
+    fontSize: 12,
+    color: '#94a3b8',
+    marginTop: 4,
+  },
+  surgeReason: {
+    fontSize: 12,
+    color: '#ea580c',
+    marginTop: 4,
+  },
+  searchButton: {
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 24,
+    backgroundColor: '#cbd5e1',
+  },
+  searchButtonActive: {
+    backgroundColor: '#2563eb',
+  },
+  searchButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#64748b',
+  },
+  searchButtonTextActive: {
+    color: '#ffffff',
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#ffffff',
+    padding: 24,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 16,
+  },
+  modalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 24,
+  },
+  modalLabel: {
+    fontSize: 16,
+    color: '#475569',
+  },
+  modalCounter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  modalCounterButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: '#e2e8f0',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalCounterText: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  modalCounterValue: {
+    fontSize: 18,
+    fontWeight: '600',
+    width: 32,
+    textAlign: 'center',
+  },
+  modalButton: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  modalCancelButton: {
+    backgroundColor: '#e2e8f0',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#475569',
+  },
+});

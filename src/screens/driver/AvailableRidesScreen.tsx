@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   RefreshControl,
+  StyleSheet,
 } from 'react-native';
 
 export default function AvailableRidesScreen() {
@@ -100,103 +101,292 @@ export default function AvailableRidesScreen() {
 
   return (
     <ScrollView
-      className="flex-1 bg-slate-50"
+      style={styles.container}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       {/* Header */}
-      <View className="bg-white px-5 py-6 border-b border-slate-200">
-        <Text className="text-2xl font-bold text-slate-800 mb-1">Available Rides</Text>
-        <Text className="text-base text-slate-500">
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Available Rides</Text>
+        <Text style={styles.headerSubtitle}>
           {availableRides.length} ride{availableRides.length !== 1 ? 's' : ''} available
         </Text>
       </View>
 
       {/* Rides List */}
       {availableRides.length > 0 ? (
-        <View className="p-5">
+        <View style={styles.ridesList}>
           {availableRides.map((ride) => (
-            <View key={ride.id} className="bg-white rounded-xl p-4 mb-4 shadow-lg">
+            <View key={ride.id} style={styles.rideCard}>
               {/* Header */}
-              <View className="flex-row justify-between items-start mb-4">
-                <View className="flex-1">
-                  <Text className="text-lg font-semibold text-slate-800 mb-1">{ride.customerName}</Text>
-                  <View className="flex-row items-center gap-3">
-                    <Text className="text-sm text-amber-500 font-medium">⭐ {ride.customerRating}</Text>
-                    <Text className="text-xs text-slate-500">{ride.requestedAt}</Text>
+              <View style={styles.rideHeader}>
+                <View style={styles.rideHeaderLeft}>
+                  <Text style={styles.customerName}>{ride.customerName}</Text>
+                  <View style={styles.customerInfo}>
+                    <Text style={styles.customerRating}>⭐ {ride.customerRating}</Text>
+                    <Text style={styles.requestedTime}>{ride.requestedAt}</Text>
                   </View>
                 </View>
                 <View
-                  className="px-2 py-1 rounded-xl"
-                  style={{ backgroundColor: getServiceTypeColor(ride.serviceType) }}
+                  style={[styles.serviceTypeBadge, { backgroundColor: getServiceTypeColor(ride.serviceType) }]}
                 >
-                  <Text className="text-xs font-medium text-white">{ride.serviceType}</Text>
+                  <Text style={styles.serviceTypeText}>{ride.serviceType}</Text>
                 </View>
               </View>
 
               {/* Route */}
-              <View className="mb-4">
-                <View className="flex-row items-center mb-2">
-                  <Text className="text-sm text-blue-600 mr-3 w-4 text-center">●</Text>
-                  <Text className="text-sm text-slate-700 flex-1">{ride.pickup}</Text>
+              <View style={styles.routeContainer}>
+                <View style={styles.routeStep}>
+                  <Text style={styles.routeDot}>●</Text>
+                  <Text style={styles.routeText}>{ride.pickup}</Text>
                 </View>
-                <View className="h-5 w-0.5 bg-slate-200 ml-1.5 mb-2" />
-                <View className="flex-row items-center">
-                  <Text className="text-sm text-blue-600 mr-3 w-4 text-center">●</Text>
-                  <Text className="text-sm text-slate-700 flex-1">{ride.drop}</Text>
+                <View style={styles.routeLine} />
+                <View style={styles.routeStep}>
+                  <Text style={styles.routeDot}>●</Text>
+                  <Text style={styles.routeText}>{ride.drop}</Text>
                 </View>
               </View>
 
               {/* Ride Details */}
-              <View className="bg-slate-50 rounded-lg p-3 mb-4">
-                <View className="flex-row justify-between mb-2">
-                  <Text className="text-sm text-slate-500">Distance:</Text>
-                  <Text className="text-sm font-medium text-slate-800">{ride.distance}</Text>
+              <View style={styles.rideDetails}>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Distance:</Text>
+                  <Text style={styles.detailValue}>{ride.distance}</Text>
                 </View>
-                <View className="flex-row justify-between mb-2">
-                  <Text className="text-sm text-slate-500">Duration:</Text>
-                  <Text className="text-sm font-medium text-slate-800">{ride.duration}</Text>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Duration:</Text>
+                  <Text style={styles.detailValue}>{ride.duration}</Text>
                 </View>
-                <View className="flex-row justify-between">
-                  <Text className="text-sm text-slate-500">Fare:</Text>
-                  <Text className="text-sm font-medium text-slate-800">₹{ride.fare}</Text>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailLabel}>Fare:</Text>
+                  <Text style={styles.detailValue}>₹{ride.fare}</Text>
                 </View>
               </View>
 
               {/* Actions */}
-              <View className="flex-row gap-3">
+              <View style={styles.actionsContainer}>
                 <TouchableOpacity
-                  className="flex-1 bg-white border border-slate-300 py-3 rounded-lg items-center"
+                  style={[styles.actionButton, styles.actionButtonSkip]}
                   onPress={() => handleRejectRide(ride.id)}
                 >
-                  <Text className="text-sm font-medium text-slate-700">Skip</Text>
+                  <Text style={styles.actionButtonText}>Skip</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  className="flex-[2] bg-green-600 py-3 rounded-lg items-center"
+                  style={[styles.actionButton, styles.actionButtonAccept]}
                   onPress={() => handleAcceptRide(ride)}
                 >
-                  <Text className="text-sm font-semibold text-white">Accept Ride</Text>
+                  <Text style={[styles.actionButtonText, styles.actionButtonTextAccept]}>Accept Ride</Text>
                 </TouchableOpacity>
               </View>
             </View>
           ))}
         </View>
       ) : (
-        <View className="flex-1 justify-center items-center px-10 py-20">
-          <Text className="text-6xl mb-4">🚗</Text>
-          <Text className="text-xl font-semibold text-slate-800 mb-2">No rides available</Text>
-          <Text className="text-base text-slate-500 text-center leading-6 mb-6">
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyIcon}>🚗</Text>
+          <Text style={styles.emptyTitle}>No rides available</Text>
+          <Text style={styles.emptyText}>
             New ride requests will appear here when available
           </Text>
           <TouchableOpacity
-            className="bg-blue-600 px-6 py-3 rounded-lg"
+            style={styles.refreshButton}
             onPress={onRefresh}
           >
-            <Text className="text-base font-medium text-white">Refresh</Text>
+            <Text style={styles.refreshButtonText}>Refresh</Text>
           </TouchableOpacity>
         </View>
       )}
     </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+  },
+  header: {
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#64748b',
+  },
+  ridesList: {
+    padding: 20,
+  },
+  rideCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  rideHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  rideHeaderLeft: {
+    flex: 1,
+  },
+  customerName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  customerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  customerRating: {
+    fontSize: 14,
+    color: '#f59e0b',
+    fontWeight: '500',
+  },
+  requestedTime: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  serviceTypeBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  serviceTypeText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#ffffff',
+  },
+  routeContainer: {
+    marginBottom: 16,
+  },
+  routeStep: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  routeDot: {
+    fontSize: 14,
+    color: '#2563eb',
+    marginRight: 12,
+    width: 16,
+    textAlign: 'center',
+  },
+  routeText: {
+    fontSize: 14,
+    color: '#475569',
+    flex: 1,
+  },
+  routeLine: {
+    height: 20,
+    width: 1,
+    backgroundColor: '#e2e8f0',
+    marginLeft: 7,
+    marginBottom: 8,
+  },
+  rideDetails: {
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  detailLabel: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  detailValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1e293b',
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  actionButtonSkip: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#cbd5e1',
+  },
+  actionButtonAccept: {
+    flex: 2,
+    backgroundColor: '#16a34a',
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  actionButtonTextAccept: {
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 40,
+    paddingVertical: 80,
+  },
+  emptyIcon: {
+    fontSize: 60,
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1e293b',
+    marginBottom: 8,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 24,
+  },
+  refreshButton: {
+    backgroundColor: '#2563eb',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  refreshButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#ffffff',
+  },
+});
