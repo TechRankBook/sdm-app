@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Import services and stores
 import { AuthService } from '@/services/supabase/auth';
@@ -74,22 +75,26 @@ export default function DriverProfileScreen() {
     {
       label: 'Total Rides',
       value: '1,247',
-      icon: '🚗',
+      icon: 'directions-car',
+      iconType: 'MaterialIcons',
     },
     {
       label: 'Rating',
       value: '4.7',
-      icon: '⭐',
+      icon: 'star',
+      iconType: 'MaterialIcons',
     },
     {
       label: 'Completion Rate',
       value: '98%',
-      icon: '✅',
+      icon: 'check-circle',
+      iconType: 'MaterialIcons',
     },
     {
       label: 'Member Since',
       value: 'Jan 2024',
-      icon: '📅',
+      icon: 'calendar-today',
+      iconType: 'MaterialIcons',
     },
   ];
 
@@ -97,37 +102,43 @@ export default function DriverProfileScreen() {
     {
       title: 'Vehicle Information',
       subtitle: 'Manage your vehicle details',
-      icon: '🚙',
+      icon: 'airport-shuttle',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Vehicle management coming soon'),
     },
     {
       title: 'Documents',
       subtitle: 'License, insurance, permits',
-      icon: '📄',
+      icon: 'description',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Document management coming soon'),
     },
     {
       title: 'Bank Details',
       subtitle: 'Update payment information',
-      icon: '🏦',
+      icon: 'account-balance',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Bank details coming soon'),
     },
     {
       title: 'Notifications',
       subtitle: 'Manage app notifications',
-      icon: '🔔',
+      icon: 'notifications',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Notifications settings coming soon'),
     },
     {
       title: 'Support',
       subtitle: 'Get help and contact us',
-      icon: '🆘',
+      icon: 'help',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Support coming soon'),
     },
     {
       title: 'Settings',
       subtitle: 'App preferences and privacy',
-      icon: '⚙️',
+      icon: 'settings',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Settings coming soon'),
     },
   ];
@@ -191,7 +202,9 @@ export default function DriverProfileScreen() {
         <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
           {driverStats.map((stat, index) => (
             <View key={index} style={styles.statItem}>
-              <Text style={styles.statIcon}>{stat.icon}</Text>
+              <View style={styles.statIcon}>
+                <MaterialIcons name={stat.icon as any} size={24} color="#64748b" />
+              </View>
               <Text style={styles.statValue}>{stat.value}</Text>
               <Text style={styles.statLabel}>{stat.label}</Text>
             </View>
@@ -208,7 +221,9 @@ export default function DriverProfileScreen() {
             onPress={item.onPress}
           >
             <View style={styles.menuItemLeft}>
-              <Text style={styles.menuItemIcon}>{item.icon}</Text>
+              <View style={styles.menuItemIcon}>
+                <MaterialIcons name={item.icon as any} size={20} color="#64748b" />
+              </View>
               <View style={styles.menuItemText}>
                 <Text style={styles.menuItemTitle}>{item.title}</Text>
                 <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
@@ -329,7 +344,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statIcon: {
-    fontSize: 24,
     marginBottom: 8,
   },
   statValue: {
@@ -372,10 +386,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemIcon: {
-    fontSize: 20,
     marginRight: 16,
     width: 24,
-    textAlign: 'center',
+    alignItems: 'center',
   },
   menuItemText: {
     flex: 1,

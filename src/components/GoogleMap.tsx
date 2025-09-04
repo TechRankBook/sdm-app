@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from 'react-native-maps';
+import * as Location from 'expo-location';
 import { GOOGLE_MAPS_API_KEY } from '@/constants';
 
 interface LocationData {
@@ -41,6 +42,73 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   const mapRef = useRef<MapView>(null);
   const [routeCoordinates, setRouteCoordinates] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
+  const [region, setRegion] = useState<any>(null);
+  const [isLocationLoading, setIsLocationLoading] = useState(true);
+
+  // Get current location
+  const getCurrentLocation = async () => {
+    setIsLocationLoading(true);
+    try {
+      console.log('Requesting location permissions...');
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      console.log('Location permission status:', status);
+
+      if (status === 'granted') {
+        console.log('Getting current position...');
+        const location = await Location.getCurrentPositionAsync({
+          accuracy: Location.Accuracy.High,
+        });
+
+        console.log('Current location:', location.coords);
+
+        const locationData: LocationData = {
+          lat: location.coords.latitude,
+          lng: location.coords.longitude,
+          address: 'Current Location',
+        };
+
+        setCurrentLocation(locationData);
+
+        // Update region to show current location
+        const newRegion = {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        };
+        setRegion(newRegion);
+        console.log('Set region to current location:', newRegion);
+      } else {
+        console.log('Location permission denied');
+        // Fallback to Bangalore coordinates if permission denied
+        const fallbackRegion = {
+          latitude: 12.9716,
+          longitude: 77.5946,
+          latitudeDelta: 0.1,
+          longitudeDelta: 0.1,
+        };
+        setRegion(fallbackRegion);
+      }
+    } catch (error) {
+      console.error('Error getting current location:', error);
+      // Fallback to Bangalore coordinates if location fails
+      const fallbackRegion = {
+        latitude: 12.9716,
+        longitude: 77.5946,
+        latitudeDelta: 0.1,
+        longitudeDelta: 0.1,
+      };
+      setRegion(fallbackRegion);
+    } finally {
+      setIsLocationLoading(false);
+    }
+  };
+
+  // Get current location on component mount
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
 
   // Calculate route when both locations are available
   useEffect(() => {
@@ -51,12 +119,15 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
     }
   }, [pickupLocation, dropoffLocation]);
 
-  // Fit map to show both markers
+  // Update region when locations change
   useEffect(() => {
-    if (mapRef.current && (pickupLocation || dropoffLocation)) {
+    console.log('Locations changed:', { pickupLocation, dropoffLocation });
+
+    if (pickupLocation || dropoffLocation) {
       const coordinates: any[] = [];
 
       if (pickupLocation) {
+        console.log('Adding pickup coordinate:', pickupLocation);
         coordinates.push({
           latitude: pickupLocation.lat,
           longitude: pickupLocation.lng,
@@ -64,6 +135,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       }
 
       if (dropoffLocation) {
+        console.log('Adding dropoff coordinate:', dropoffLocation);
         coordinates.push({
           latitude: dropoffLocation.lat,
           longitude: dropoffLocation.lng,
@@ -71,10 +143,38 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       }
 
       if (coordinates.length > 0) {
-        mapRef.current.fitToCoordinates(coordinates, {
-          edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
-          animated: true,
-        });
+        // Calculate center point
+        const avgLat = coordinates.reduce((sum, coord) => sum + coord.latitude, 0) / coordinates.length;
+        const avgLng = coordinates.reduce((sum, coord) => sum + coord.longitude, 0) / coordinates.length;
+
+        // Calculate appropriate zoom level based on distance
+        let latitudeDelta = 0.01;
+        let longitudeDelta = 0.01;
+
+        if (coordinates.length > 1) {
+          const latDiff = Math.abs(coordinates[0].latitude - coordinates[1].latitude);
+          const lngDiff = Math.abs(coordinates[0].longitude - coordinates[1].longitude);
+          latitudeDelta = Math.max(latDiff * 1.5, 0.01);
+          longitudeDelta = Math.max(lngDiff * 1.5, 0.01);
+        }
+
+        const newRegion = {
+          latitude: avgLat,
+          longitude: avgLng,
+          latitudeDelta,
+          longitudeDelta,
+        };
+
+        console.log('Setting new region:', newRegion);
+        setRegion(newRegion);
+
+        // Also fit to coordinates if map is ready
+        if (mapRef.current) {
+          mapRef.current.fitToCoordinates(coordinates, {
+            edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+            animated: true,
+          });
+        }
       }
     }
   }, [pickupLocation, dropoffLocation]);
@@ -210,6 +310,12 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   };
 
   const getMapRegion = () => {
+    // If we have a region set (from current location), use it
+    if (region) {
+      return region;
+    }
+
+    // If pickup location exists, center on it
     if (pickupLocation) {
       return {
         latitude: pickupLocation.lat,
@@ -219,7 +325,17 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       };
     }
 
-    // Default to Bangalore
+    // If dropoff location exists, center on it
+    if (dropoffLocation) {
+      return {
+        latitude: dropoffLocation.lat,
+        longitude: dropoffLocation.lng,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+    }
+
+    // Default to Bangalore (more central location)
     return {
       latitude: 12.9716,
       longitude: 77.5946,
@@ -237,37 +353,62 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
           width: '100%',
           height: typeof height === 'string' ? parseInt(height) : height,
         }}
-        region={getMapRegion()}
+        region={region || getMapRegion()}
         onPress={handleMapPress}
         showsUserLocation={true}
-        showsMyLocationButton={true}
-        zoomEnabled={true}
+        showsMyLocationButton={interactive}
+        zoomEnabled={interactive}
         scrollEnabled={interactive}
         rotateEnabled={interactive}
+        loadingEnabled={true}
+        loadingIndicatorColor="#2563eb"
+        loadingBackgroundColor="#ffffff"
+        onMapReady={() => {
+          console.log('Map is ready');
+        }}
+        onRegionChangeComplete={(newRegion) => {
+          // Update region state when user interacts with map
+          if (interactive) {
+            setRegion(newRegion);
+          }
+        }}
       >
         {/* Pickup Marker */}
-        {pickupLocation && (
+        {pickupLocation && pickupLocation.lat && pickupLocation.lng && (
           <Marker
             coordinate={{
               latitude: pickupLocation.lat,
               longitude: pickupLocation.lng,
             }}
             title="Pickup Location"
-            description={pickupLocation.address}
+            description={pickupLocation.address || 'Pickup Location'}
             pinColor="green"
           />
         )}
 
         {/* Dropoff Marker */}
-        {dropoffLocation && (
+        {dropoffLocation && dropoffLocation.lat && dropoffLocation.lng && (
           <Marker
             coordinate={{
               latitude: dropoffLocation.lat,
               longitude: dropoffLocation.lng,
             }}
             title="Drop-off Location"
-            description={dropoffLocation.address}
+            description={dropoffLocation.address || 'Drop-off Location'}
             pinColor="red"
+          />
+        )}
+
+        {/* Current Location Marker */}
+        {currentLocation && (
+          <Marker
+            coordinate={{
+              latitude: currentLocation.lat,
+              longitude: currentLocation.lng,
+            }}
+            title="Current Location"
+            description="Your current location"
+            pinColor="blue"
           />
         )}
 
@@ -282,10 +423,12 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       </MapView>
 
       {/* Loading Indicator */}
-      {isLoading && (
+      {(isLoading || isLocationLoading) && (
         <View style={styles.loadingOverlay}>
           <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Calculating route...</Text>
+            <Text style={styles.loadingText}>
+              {isLocationLoading ? 'Getting your location...' : 'Calculating route...'}
+            </Text>
           </View>
         </View>
       )}

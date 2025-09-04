@@ -8,6 +8,7 @@ import {
   TextInput,
   StyleSheet,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Import services and stores
 import { AuthService } from '@/services/supabase/auth';
@@ -73,17 +74,20 @@ export default function ProfileScreen() {
     {
       label: 'Total Rides',
       value: '12',
-      icon: '🚗',
+      icon: 'directions-car',
+      iconType: 'MaterialIcons',
     },
     {
       label: 'Rating',
       value: '4.8',
-      icon: '⭐',
+      icon: 'star',
+      iconType: 'MaterialIcons',
     },
     {
       label: 'Member Since',
       value: 'Jan 2024',
-      icon: '📅',
+      icon: 'calendar-today',
+      iconType: 'MaterialIcons',
     },
   ];
 
@@ -91,37 +95,43 @@ export default function ProfileScreen() {
     {
       title: 'Payment Methods',
       subtitle: 'Manage cards and UPI',
-      icon: '💳',
+      icon: 'credit-card',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Payment methods feature coming soon'),
     },
     {
       title: 'Saved Addresses',
       subtitle: 'Manage favorite locations',
-      icon: '📍',
+      icon: 'location-on',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Saved addresses feature coming soon'),
     },
     {
       title: 'Notifications',
       subtitle: 'Manage app notifications',
-      icon: '🔔',
+      icon: 'notifications',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Notifications settings coming soon'),
     },
     {
       title: 'Help & Support',
       subtitle: 'Get help and contact us',
-      icon: '🆘',
+      icon: 'help',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Help & support feature coming soon'),
     },
     {
       title: 'Privacy Policy',
       subtitle: 'Read our privacy policy',
-      icon: '🔒',
+      icon: 'security',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Privacy policy feature coming soon'),
     },
     {
       title: 'Terms of Service',
       subtitle: 'Read our terms and conditions',
-      icon: '📄',
+      icon: 'description',
+      iconType: 'MaterialIcons',
       onPress: () => Alert.alert('Coming Soon', 'Terms of service feature coming soon'),
     },
   ];
@@ -187,7 +197,9 @@ export default function ProfileScreen() {
         <View style={styles.statsContainer}>
           {profileStats.map((stat, index) => (
             <View key={index} style={styles.statItem}>
-              <Text style={styles.statIcon}>{stat.icon}</Text>
+              <View style={styles.statIcon}>
+                <MaterialIcons name={stat.icon as any} size={28} color="#64748b" />
+              </View>
               <Text style={styles.statValue}>{stat.value}</Text>
               <Text style={styles.statLabel}>{stat.label}</Text>
             </View>
@@ -204,7 +216,9 @@ export default function ProfileScreen() {
             onPress={item.onPress}
           >
             <View style={styles.menuItemContent}>
-              <Text style={styles.menuItemIcon}>{item.icon}</Text>
+              <View style={styles.menuItemIcon}>
+                <MaterialIcons name={item.icon as any} size={24} color="#64748b" />
+              </View>
               <View style={styles.menuItemText}>
                 <Text style={styles.menuItemTitle}>{item.title}</Text>
                 <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
@@ -345,7 +359,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statIcon: {
-    fontSize: 28,
     marginBottom: 8,
   },
   statValue: {
@@ -391,10 +404,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   menuItemIcon: {
-    fontSize: 24,
     marginRight: 16,
     width: 24,
-    textAlign: 'center',
+    alignItems: 'center',
   },
   menuItemText: {
     flex: 1,

@@ -8,6 +8,7 @@ import {
   Switch,
   StyleSheet,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Import services and stores
 import { useAppStore, useUser } from '@/stores/appStore';
@@ -91,7 +92,10 @@ export default function DriverHomeScreen() {
       {/* Available Ride Request */}
       {isOnline && !currentRide && (
         <View style={styles.requestCard}>
-          <Text style={styles.requestTitle}>🚗 New Ride Request</Text>
+          <View style={styles.requestTitleContainer}>
+            <MaterialIcons name="directions-car" size={20} color="#1e293b" />
+            <Text style={styles.requestTitle}>New Ride Request</Text>
+          </View>
           <View style={styles.requestDetails}>
             <Text style={styles.requestDetailText}>Distance: 2.5 km</Text>
             <Text style={styles.requestDetailText}>Fare: ₹180</Text>
@@ -120,22 +124,22 @@ export default function DriverHomeScreen() {
         <Text style={styles.statsTitle}>Today's Summary</Text>
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
-            <Text style={styles.statIcon}>💰</Text>
+            <MaterialIcons name="attach-money" size={28} color="#10b981" />
             <Text style={styles.statValue}>₹{stats.todayEarnings}</Text>
             <Text style={styles.statLabel}>Earnings</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statIcon}>🚗</Text>
+            <MaterialIcons name="directions-car" size={28} color="#2563eb" />
             <Text style={styles.statValue}>{stats.todayRides}</Text>
             <Text style={styles.statLabel}>Rides</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statIcon}>⭐</Text>
+            <MaterialIcons name="star" size={28} color="#f59e0b" />
             <Text style={styles.statValue}>{stats.rating}</Text>
             <Text style={styles.statLabel}>Rating</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statIcon}>📊</Text>
+            <MaterialIcons name="bar-chart" size={28} color="#8b5cf6" />
             <Text style={styles.statValue}>{stats.totalRides}</Text>
             <Text style={styles.statLabel}>Total</Text>
           </View>
@@ -147,19 +151,19 @@ export default function DriverHomeScreen() {
         <Text style={styles.actionsTitle}>Quick Actions</Text>
         <View style={styles.actionsGrid}>
           <TouchableOpacity style={styles.actionCard}>
-            <Text style={styles.actionIcon}>📍</Text>
+            <MaterialIcons name="my-location" size={24} color="#64748b" />
             <Text style={styles.actionText}>Update Location</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionCard}>
-            <Text style={styles.actionIcon}>📞</Text>
+            <MaterialIcons name="phone" size={24} color="#ef4444" />
             <Text style={styles.actionText}>Emergency</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionCard}>
-            <Text style={styles.actionIcon}>⚙️</Text>
+            <MaterialIcons name="settings" size={24} color="#64748b" />
             <Text style={styles.actionText}>Settings</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionCard}>
-            <Text style={styles.actionIcon}>📈</Text>
+            <MaterialIcons name="analytics" size={24} color="#64748b" />
             <Text style={styles.actionText}>Analytics</Text>
           </TouchableOpacity>
         </View>
@@ -287,11 +291,16 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 8,
   },
+  requestTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
   requestTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#1e293b',
-    marginBottom: 12,
   },
   requestDetails: {
     marginBottom: 16,
@@ -362,10 +371,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  statIcon: {
-    fontSize: 28,
-    marginBottom: 8,
-  },
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -408,10 +413,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 5,
-  },
-  actionIcon: {
-    fontSize: 24,
-    marginBottom: 8,
   },
   actionText: {
     fontSize: 14,

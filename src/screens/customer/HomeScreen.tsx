@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Import services and stores
 import { AuthService } from '@/services/supabase/auth';
@@ -62,28 +63,32 @@ export default function HomeScreen() {
     {
       title: 'Book a Ride',
       subtitle: 'Find and book your next ride',
-      icon: '🚗',
+      icon: 'directions-car',
+      iconType: 'MaterialIcons',
       onPress: handleBookRide,
       color: '#2563eb',
     },
     {
       title: 'Ride History',
       subtitle: 'View your past rides',
-      icon: '📋',
+      icon: 'history',
+      iconType: 'MaterialIcons',
       onPress: handleViewHistory,
       color: '#10b981',
     },
     {
       title: 'My Profile',
       subtitle: 'Manage your account',
-      icon: '👤',
+      icon: 'person',
+      iconType: 'MaterialIcons',
       onPress: handleViewProfile,
       color: '#ef4444',
     },
     {
       title: 'Support',
       subtitle: 'Get help and support',
-      icon: '🆘',
+      icon: 'help',
+      iconType: 'MaterialIcons',
       onPress: () => navigation.navigate('Support'),
       color: '#f59e0b',
     },
@@ -108,7 +113,9 @@ export default function HomeScreen() {
               style={[styles.actionCard, { borderLeftColor: action.color }]}
               onPress={action.onPress}
             >
-              <Text style={styles.actionIcon}>{action.icon}</Text>
+              <View style={styles.actionIcon}>
+                <MaterialIcons name={action.icon as any} size={28} color="#64748b" />
+              </View>
               <Text style={styles.actionTitle}>{action.title}</Text>
               <Text style={styles.actionSubtitle}>{action.subtitle}</Text>
             </TouchableOpacity>
@@ -210,7 +217,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   actionIcon: {
-    fontSize: 28,
     marginBottom: 12,
   },
   actionTitle: {

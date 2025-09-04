@@ -8,6 +8,7 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function AvailableRidesScreen() {
   const [refreshing, setRefreshing] = useState(false);
@@ -124,7 +125,10 @@ export default function AvailableRidesScreen() {
                 <View style={styles.rideHeaderLeft}>
                   <Text style={styles.customerName}>{ride.customerName}</Text>
                   <View style={styles.customerInfo}>
-                    <Text style={styles.customerRating}>⭐ {ride.customerRating}</Text>
+                    <View style={styles.customerRatingContainer}>
+                      <MaterialIcons name="star" size={14} color="#f59e0b" />
+                      <Text style={styles.customerRating}>{ride.customerRating}</Text>
+                    </View>
                     <Text style={styles.requestedTime}>{ride.requestedAt}</Text>
                   </View>
                 </View>
@@ -184,7 +188,7 @@ export default function AvailableRidesScreen() {
         </View>
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>🚗</Text>
+          <MaterialIcons name="directions-car" size={60} color="#cbd5e1" />
           <Text style={styles.emptyTitle}>No rides available</Text>
           <Text style={styles.emptyText}>
             New ride requests will appear here when available
@@ -259,6 +263,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
+  },
+  customerRatingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   customerRating: {
     fontSize: 14,
@@ -360,10 +369,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 40,
     paddingVertical: 80,
-  },
-  emptyIcon: {
-    fontSize: 60,
-    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 20,

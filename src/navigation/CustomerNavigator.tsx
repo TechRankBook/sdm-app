@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Import screens
 import HomeScreen from '@/screens/customer/HomeScreen';
@@ -46,6 +47,9 @@ function CustomerTabNavigator() {
         options={{
           title: 'Home',
           tabBarLabel: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="home" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -54,6 +58,9 @@ function CustomerTabNavigator() {
         options={{
           title: 'Book Ride',
           tabBarLabel: 'Book',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="directions-car" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -62,6 +69,9 @@ function CustomerTabNavigator() {
         options={{
           title: 'Ride History',
           tabBarLabel: 'History',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="history" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -70,6 +80,9 @@ function CustomerTabNavigator() {
         options={{
           title: 'Profile',
           tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="person" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -78,6 +91,9 @@ function CustomerTabNavigator() {
         options={{
           title: 'Support',
           tabBarLabel: 'Support',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="help" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>

@@ -8,6 +8,7 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Import services and stores
 import { supabase } from '../../services/supabase/client';
@@ -191,7 +192,7 @@ export default function RideHistoryScreen() {
         </View>
       ) : (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyIcon}>🚗</Text>
+          <MaterialIcons name="directions-car" size={60} color="#cbd5e1" />
           <Text style={styles.emptyTitle}>No rides yet</Text>
           <Text style={styles.emptyText}>
             Your completed rides will appear here
@@ -373,10 +374,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 40,
     paddingVertical: 80,
-  },
-  emptyIcon: {
-    fontSize: 60,
-    marginBottom: 16,
   },
   emptyTitle: {
     fontSize: 20,

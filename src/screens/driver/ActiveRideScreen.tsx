@@ -7,6 +7,7 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function ActiveRideScreen() {
   const [rideStatus, setRideStatus] = useState<'pickup' | 'in_progress' | 'completed'>('pickup');
@@ -104,7 +105,10 @@ export default function ActiveRideScreen() {
           style={styles.callButton}
           onPress={handleCallCustomer}
         >
-          <Text style={styles.callButtonText}>📞 Call Customer</Text>
+          <View style={styles.callButtonContent}>
+            <MaterialIcons name="phone" size={16} color="#ffffff" />
+            <Text style={styles.callButtonText}>Call Customer</Text>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -177,7 +181,10 @@ export default function ActiveRideScreen() {
 
         {rideStatus === 'completed' && (
           <View style={styles.completedCard}>
-            <Text style={styles.completedTitle}>✅ Ride Completed</Text>
+            <View style={styles.completedTitleContainer}>
+              <MaterialIcons name="check-circle" size={20} color="#166534" />
+              <Text style={styles.completedTitle}>Ride Completed</Text>
+            </View>
             <Text style={styles.completedText}>
               Payment of ₹{activeRide.fare} will be credited to your account
             </Text>
@@ -191,7 +198,10 @@ export default function ActiveRideScreen() {
           style={styles.emergencyButton}
           onPress={handleEmergency}
         >
-          <Text style={styles.emergencyButtonText}>🚨 Emergency</Text>
+          <View style={styles.emergencyButtonContent}>
+            <MaterialIcons name="warning" size={18} color="#ffffff" />
+            <Text style={styles.emergencyButtonText}>Emergency</Text>
+          </View>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -276,6 +286,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
+  callButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   callButtonText: {
     fontSize: 14,
     fontWeight: '500',
@@ -359,11 +374,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#bbf7d0',
   },
+  completedTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
   completedTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#166534',
-    marginBottom: 8,
   },
   completedText: {
     fontSize: 14,
@@ -379,6 +399,11 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  emergencyButtonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   emergencyButtonText: {
     fontSize: 16,

@@ -9,6 +9,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { RazorpayService } from '../../services/payment/razorpay';
 import { usePayment } from '../../hooks/usePayment';
 
@@ -28,10 +29,10 @@ export default function PaymentScreen() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('');
 
   const paymentMethods = [
-    { id: 'card', name: 'Credit/Debit Card', icon: '💳' },
-    { id: 'upi', name: 'UPI', icon: '📱' },
-    { id: 'netbanking', name: 'Net Banking', icon: '🏦' },
-    { id: 'wallet', name: 'Wallet', icon: '👛' },
+    { id: 'card', name: 'Credit/Debit Card', icon: 'credit-card', iconType: 'MaterialIcons' },
+    { id: 'upi', name: 'UPI', icon: 'smartphone', iconType: 'MaterialIcons' },
+    { id: 'netbanking', name: 'Net Banking', icon: 'account-balance', iconType: 'MaterialIcons' },
+    { id: 'wallet', name: 'Wallet', icon: 'account-balance-wallet', iconType: 'MaterialIcons' },
   ];
 
   const handlePayment = async () => {
@@ -105,7 +106,9 @@ export default function PaymentScreen() {
               ]}
               onPress={() => setSelectedPaymentMethod(method.id)}
             >
-              <Text style={styles.paymentMethodIcon}>{method.icon}</Text>
+              <View style={styles.paymentMethodIcon}>
+                <MaterialIcons name={method.icon as any} size={24} color="#64748b" />
+              </View>
               <Text style={[
                 styles.paymentMethodName,
                 selectedPaymentMethod === method.id && styles.paymentMethodNameSelected
@@ -113,7 +116,7 @@ export default function PaymentScreen() {
                 {method.name}
               </Text>
               {selectedPaymentMethod === method.id && (
-                <Text style={styles.paymentMethodCheck}>✓</Text>
+                <MaterialIcons name="check" size={18} color="#2563eb" />
               )}
             </TouchableOpacity>
           ))}
@@ -159,9 +162,12 @@ export default function PaymentScreen() {
       {/* Security Note */}
       <View style={styles.securityNote}>
         <View style={styles.securityCard}>
-          <Text style={styles.securityText}>
-            🔒 Your payment is secured with 256-bit SSL encryption
-          </Text>
+          <View style={styles.securityContent}>
+            <MaterialIcons name="security" size={16} color="#1e40af" />
+            <Text style={styles.securityText}>
+              Your payment is secured with 256-bit SSL encryption
+            </Text>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -256,7 +262,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#eff6ff',
   },
   paymentMethodIcon: {
-    fontSize: 24,
     marginRight: 12,
   },
   paymentMethodName: {
@@ -322,6 +327,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#bfdbfe',
+  },
+  securityContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   securityText: {
     fontSize: 14,

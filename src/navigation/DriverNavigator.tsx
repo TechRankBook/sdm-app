@@ -1,6 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // Import screens
 import DriverHomeScreen from '@/screens/driver/DriverHomeScreen';
@@ -45,6 +46,9 @@ function DriverTabNavigator() {
         options={{
           title: 'Dashboard',
           tabBarLabel: 'Dashboard',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="dashboard" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -53,6 +57,9 @@ function DriverTabNavigator() {
         options={{
           title: 'Available Rides',
           tabBarLabel: 'Rides',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="directions-car" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -61,6 +68,9 @@ function DriverTabNavigator() {
         options={{
           title: 'Active Ride',
           tabBarLabel: 'Active',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="play-circle-filled" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -69,6 +79,9 @@ function DriverTabNavigator() {
         options={{
           title: 'Earnings',
           tabBarLabel: 'Earnings',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="attach-money" size={size} color={color} />
+          ),
         }}
       />
       <Tab.Screen
@@ -77,6 +90,9 @@ function DriverTabNavigator() {
         options={{
           title: 'Profile',
           tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="person" size={size} color={color} />
+          ),
         }}
       />
     </Tab.Navigator>

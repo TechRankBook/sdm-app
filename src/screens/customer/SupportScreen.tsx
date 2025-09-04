@@ -8,6 +8,7 @@ import {
   Alert,
   Linking,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 
 export default function SupportScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -17,7 +18,8 @@ export default function SupportScreen() {
       id: 'booking',
       title: 'Booking Issues',
       description: 'Problems with booking rides',
-      icon: '📅',
+      icon: 'event-note',
+      iconType: 'MaterialIcons',
       faqs: [
         'How do I cancel a booking?',
         'Can I modify my booking?',
@@ -29,7 +31,8 @@ export default function SupportScreen() {
       id: 'payment',
       title: 'Payment & Billing',
       description: 'Payment methods and billing questions',
-      icon: '💳',
+      icon: 'credit-card',
+      iconType: 'MaterialIcons',
       faqs: [
         'How do I add a payment method?',
         'Can I get a refund?',
@@ -41,7 +44,8 @@ export default function SupportScreen() {
       id: 'account',
       title: 'Account & Profile',
       description: 'Account settings and profile management',
-      icon: '👤',
+      icon: 'person',
+      iconType: 'MaterialIcons',
       faqs: [
         'How to change my phone number?',
         'Can I delete my account?',
@@ -53,7 +57,8 @@ export default function SupportScreen() {
       id: 'safety',
       title: 'Safety & Security',
       description: 'Safety features and emergency contacts',
-      icon: '🛡️',
+      icon: 'security',
+      iconType: 'MaterialIcons',
       faqs: [
         'How to contact emergency services?',
         'What if I feel unsafe?',
@@ -65,7 +70,8 @@ export default function SupportScreen() {
       id: 'technical',
       title: 'Technical Support',
       description: 'App issues and technical problems',
-      icon: '🔧',
+      icon: 'build',
+      iconType: 'MaterialIcons',
       faqs: [
         'App not loading properly',
         'Location services not working',
@@ -79,7 +85,8 @@ export default function SupportScreen() {
     {
       title: 'Call Support',
       subtitle: 'Speak to our support team',
-      icon: '📞',
+      icon: 'phone',
+      iconType: 'MaterialIcons',
       action: () => {
         const phoneNumber = '+91-1800-XXX-XXXX';
         Alert.alert(
@@ -95,7 +102,8 @@ export default function SupportScreen() {
     {
       title: 'Email Support',
       subtitle: 'Send us an email',
-      icon: '📧',
+      icon: 'email',
+      iconType: 'MaterialIcons',
       action: () => {
         const email = 'support@sdmcabhailing.com';
         const subject = 'Support Request';
@@ -106,7 +114,8 @@ export default function SupportScreen() {
     {
       title: 'WhatsApp Support',
       subtitle: 'Chat with us on WhatsApp',
-      icon: '💬',
+      icon: 'chat',
+      iconType: 'MaterialIcons',
       action: () => {
         const phoneNumber = '+91-9876543210';
         const message = 'Hi, I need help with SDM Cab Hailing';
@@ -119,7 +128,8 @@ export default function SupportScreen() {
     {
       title: 'Live Chat',
       subtitle: 'Chat with our support bot',
-      icon: '🤖',
+      icon: 'smart-toy',
+      iconType: 'MaterialIcons',
       action: () => {
         Alert.alert('Coming Soon', 'Live chat feature will be available soon!');
       },
@@ -154,7 +164,9 @@ export default function SupportScreen() {
               onPress={() => handleCategorySelect(category.id)}
             >
               <View style={styles.categoryHeader}>
-                <Text style={styles.categoryIcon}>{category.icon}</Text>
+                <View style={styles.categoryIcon}>
+                  <MaterialIcons name={category.icon as any} size={24} color="#64748b" />
+                </View>
                 <View style={styles.categoryInfo}>
                   <Text style={styles.categoryTitle}>{category.title}</Text>
                   <Text style={styles.categoryDescription}>
@@ -195,7 +207,9 @@ export default function SupportScreen() {
             onPress={option.action}
           >
             <View style={styles.contactLeft}>
-              <Text style={styles.contactIcon}>{option.icon}</Text>
+              <View style={styles.contactIcon}>
+                <MaterialIcons name={option.icon as any} size={20} color="#64748b" />
+              </View>
               <View style={styles.contactInfo}>
                 <Text style={styles.contactTitle}>{option.title}</Text>
                 <Text style={styles.contactSubtitle}>{option.subtitle}</Text>
@@ -209,7 +223,9 @@ export default function SupportScreen() {
       {/* Emergency Contact */}
       <View style={styles.emergencySection}>
         <View style={styles.emergencyCard}>
-          <Text style={styles.emergencyIcon}>🚨</Text>
+          <View style={styles.emergencyIcon}>
+            <MaterialIcons name="warning" size={24} color="#dc2626" />
+          </View>
           <View style={styles.emergencyInfo}>
             <Text style={styles.emergencyTitle}>Emergency</Text>
             <Text style={styles.emergencyDescription}>
@@ -279,10 +295,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryIcon: {
-    fontSize: 24,
     marginRight: 16,
     width: 32,
-    textAlign: 'center',
+    alignItems: 'center',
   },
   categoryInfo: {
     flex: 1,
@@ -348,10 +363,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contactIcon: {
-    fontSize: 20,
     marginRight: 16,
     width: 24,
-    textAlign: 'center',
+    alignItems: 'center',
   },
   contactInfo: {
     flex: 1,
@@ -385,7 +399,6 @@ const styles = StyleSheet.create({
     borderColor: '#fecaca',
   },
   emergencyIcon: {
-    fontSize: 24,
     marginRight: 16,
   },
   emergencyInfo: {

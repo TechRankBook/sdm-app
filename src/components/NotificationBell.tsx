@@ -8,6 +8,7 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { useAppStore } from '../stores/appStore';
 
 export default function NotificationBell() {
@@ -46,7 +47,7 @@ export default function NotificationBell() {
         style={styles.bellContainer}
         onPress={() => setShowNotifications(true)}
       >
-        <Text style={styles.bellIcon}>🔔</Text>
+        <MaterialIcons name="notifications" size={20} color="#64748b" />
         {unreadCount > 0 && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
@@ -81,7 +82,7 @@ export default function NotificationBell() {
                   style={styles.closeButton}
                   onPress={() => setShowNotifications(false)}
                 >
-                  <Text style={styles.closeButtonText}>✕</Text>
+                  <MaterialIcons name="close" size={18} color="#64748b" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -89,7 +90,9 @@ export default function NotificationBell() {
             <ScrollView style={styles.scrollContainer}>
               {notifications.length === 0 ? (
                 <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyIcon}>🔔</Text>
+                  <View style={styles.emptyIcon}>
+                    <MaterialIcons name="notifications" size={48} color="#cbd5e1" />
+                  </View>
                   <Text style={styles.emptyTitle}>
                     No notifications yet
                   </Text>
@@ -154,9 +157,6 @@ const styles = StyleSheet.create({
   bellContainer: {
     position: 'relative',
     padding: 8,
-  },
-  bellIcon: {
-    fontSize: 20,
   },
   badge: {
     position: 'absolute',
@@ -226,7 +226,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyIcon: {
-    fontSize: 48,
     marginBottom: 16,
   },
   emptyTitle: {

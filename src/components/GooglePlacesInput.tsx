@@ -8,6 +8,8 @@ import {
   Alert,
   StyleSheet,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
 import { GOOGLE_MAPS_API_KEY } from '@/constants';
 
 interface GooglePlacesInputProps {
@@ -39,6 +41,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [showPredictions, setShowPredictions] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   const searchPlaces = async (query: string) => {
@@ -125,6 +128,67 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     }
   };
 
+  const getCurrentLocation = async () => {
+    setIsGettingLocation(true);
+    try {
+      // Request location permissions
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(
+          'Permission Denied',
+          'Location permission is required to use current location. Please enable it in your device settings.',
+          [{ text: 'OK' }]
+        );
+        return;
+      }
+
+      // Get current position
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
+
+      const { latitude, longitude } = location.coords;
+
+      // Reverse geocode to get address
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
+      );
+
+      const data = await response.json();
+      if (data.status === 'OK' && data.results.length > 0) {
+        const address = data.results[0].formatted_address;
+
+        // Create place object similar to Google Places API response
+        const place = {
+          description: address,
+          geometry: {
+            location: {
+              lat: latitude,
+              lng: longitude,
+            },
+          },
+          formatted_address: address,
+        };
+
+        onPlaceSelect(place);
+        onChange(address);
+        setShowPredictions(false);
+        inputRef.current?.blur();
+      } else {
+        Alert.alert('Error', 'Unable to get address for your current location. Please try again.');
+      }
+    } catch (error) {
+      console.error('Location error:', error);
+      Alert.alert(
+        'Location Error',
+        'Unable to get your current location. Please check your GPS settings and try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setIsGettingLocation(false);
+    }
+  };
+
   const handleTextChange = (text: string) => {
     onChange(text);
     searchPlaces(text);
@@ -133,11 +197,11 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   const getIcon = () => {
     switch (icon) {
       case 'pickup':
-        return '📍';
+        return <MaterialIcons name="location-on" size={18} color="#64748b" />;
       case 'dropoff':
-        return '🏁';
+        return <MaterialIcons name="flag" size={18} color="#64748b" />;
       default:
-        return '📍';
+        return <MaterialIcons name="location-on" size={18} color="#64748b" />;
     }
   };
 
@@ -145,7 +209,9 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   return (
     <View style={styles.container} pointerEvents="box-none">
       <View style={styles.inputContainer}>
-        <Text style={styles.inputIcon}>{getIcon()}</Text>
+        <View style={styles.inputIcon}>
+          {getIcon()}
+        </View>
         <TextInput
           ref={inputRef}
           style={styles.textInput}
@@ -192,13 +258,20 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
 
       {showCurrentLocation && (
         <TouchableOpacity
-          style={styles.currentLocationButton}
-          onPress={() => {
-            // This would integrate with device location
-            Alert.alert('Current Location', 'Location service integration coming soon');
-          }}
+          style={[styles.currentLocationButton, isGettingLocation && styles.currentLocationButtonDisabled]}
+          onPress={getCurrentLocation}
+          disabled={isGettingLocation}
         >
-          <Text style={styles.currentLocationText}>📍 Use Current Location</Text>
+          <View style={styles.currentLocationContent}>
+            <MaterialIcons
+              name={isGettingLocation ? "location-searching" : "my-location"}
+              size={16}
+              color={isGettingLocation ? "#64748b" : "#2563eb"}
+            />
+            <Text style={[styles.currentLocationText, isGettingLocation && styles.currentLocationTextDisabled]}>
+              {isGettingLocation ? 'Getting Location...' : 'Use Current Location'}
+            </Text>
+          </View>
         </TouchableOpacity>
       )}
     </View>
@@ -219,7 +292,6 @@ const styles = StyleSheet.create({
     borderColor: '#e2e8f0',
   },
   inputIcon: {
-    fontSize: 18,
     marginRight: 12,
   },
   textInput: {
@@ -272,9 +344,20 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
+  currentLocationButtonDisabled: {
+    backgroundColor: '#f1f5f9',
+  },
+  currentLocationContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   currentLocationText: {
     fontSize: 14,
     fontWeight: '500',
     color: '#2563eb',
+  },
+  currentLocationTextDisabled: {
+    color: '#64748b',
   },
 });
