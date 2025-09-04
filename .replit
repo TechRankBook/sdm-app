@@ -17,6 +17,10 @@ author = "agent"
 task = "workflow.run"
 args = "Expo Web Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Expo Android"
+
 [[workflows.workflow]]
 name = "Expo Web Server"
 author = "agent"
@@ -29,9 +33,24 @@ task = "shell.exec"
 args = "npx expo start --web --port 5000 --host lan --clear"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "Expo Android"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx expo start --android --clear"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 8081
+externalPort = 8081
 
 [deployment]
 deploymentTarget = "autoscale"

@@ -40,9 +40,9 @@ export const ServiceTypeStep: React.FC<ServiceTypeStepProps> = ({
           >
             <View style={styles.serviceIconContainer}>
               {service.iconType === 'MaterialIcons' ? (
-                <MaterialIcons name={service.icon as any} size={24} color="#64748b" />
+                <MaterialIcons name={service.icon as any} size={24} color="#f59e0b" />
               ) : (
-                <Ionicons name={service.icon as any} size={24} color="#64748b" />
+                <Ionicons name={service.icon as any} size={24} color="#f59e0b" />
               )}
             </View>
             <View style={styles.serviceContent}>
@@ -89,7 +89,7 @@ export const ServiceTypeStep: React.FC<ServiceTypeStepProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fffbeb',
   },
   header: {
     padding: 16,
@@ -98,12 +98,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1e293b',
+    color: '#78350f',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#92400e',
     textAlign: 'center',
   },
   serviceGrid: {
@@ -128,14 +128,14 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   serviceCardActive: {
-    borderColor: '#2563eb',
-    backgroundColor: '#eff6ff',
+    borderColor: '#f59e0b',
+    backgroundColor: '#fef3c7',
   },
   serviceIconContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: '#fef3c7',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -149,24 +149,24 @@ const styles = StyleSheet.create({
   serviceName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1e293b',
+    color: '#78350f',
     marginBottom: 4,
   },
   serviceNameActive: {
-    color: '#2563eb',
+    color: '#b45309',
   },
   serviceDescription: {
     fontSize: 14,
-    color: '#64748b',
+    color: '#92400e',
   },
   serviceDescriptionActive: {
-    color: '#475569',
+    color: '#78350f',
   },
   checkmark: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#2563eb',
+    backgroundColor: '#f59e0b',
     alignItems: 'center',
     justifyContent: 'center',
   },

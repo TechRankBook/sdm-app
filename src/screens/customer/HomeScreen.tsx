@@ -66,7 +66,7 @@ export default function HomeScreen() {
       icon: 'directions-car',
       iconType: 'MaterialIcons',
       onPress: handleBookRide,
-      color: '#2563eb',
+      color: '#f59e0b',
     },
     {
       title: 'Ride History',
@@ -74,7 +74,7 @@ export default function HomeScreen() {
       icon: 'history',
       iconType: 'MaterialIcons',
       onPress: handleViewHistory,
-      color: '#10b981',
+      color: '#f59e0b',
     },
     {
       title: 'My Profile',
@@ -82,7 +82,7 @@ export default function HomeScreen() {
       icon: 'person',
       iconType: 'MaterialIcons',
       onPress: handleViewProfile,
-      color: '#ef4444',
+      color: '#f59e0b',
     },
     {
       title: 'Support',
@@ -114,7 +114,7 @@ export default function HomeScreen() {
               onPress={action.onPress}
             >
               <View style={styles.actionIcon}>
-                <MaterialIcons name={action.icon as any} size={28} color="#64748b" />
+                <MaterialIcons name={action.icon as any} size={28} color="#f59e0b" />
               </View>
               <Text style={styles.actionTitle}>{action.title}</Text>
               <Text style={styles.actionSubtitle}>{action.subtitle}</Text>
@@ -149,39 +149,39 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fffbeb',
   },
   header: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fef3c7',
     marginHorizontal: 20,
     marginTop: 20,
     padding: 24,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    shadowColor: '#000',
+    borderColor: 'rgba(245, 158, 11, 0.2)',
+    shadowColor: '#f59e0b',
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 4,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 8,
   },
   welcomeText: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#92400e',
     marginBottom: 8,
   },
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1e293b',
+    color: '#78350f',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#64748b',
+    color: '#92400e',
   },
   actionsSection: {
     paddingHorizontal: 20,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#1e293b',
+    color: '#78350f',
     marginBottom: 16,
   },
   actionsGrid: {
@@ -202,19 +202,19 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: '45%',
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: 16,
+    padding: 20,
     borderLeftWidth: 4,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    shadowColor: '#000',
+    borderColor: 'rgba(245, 158, 11, 0.1)',
+    shadowColor: '#f59e0b',
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 6,
     },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
+    shadowRadius: 10,
+    elevation: 8,
   },
   actionIcon: {
     marginBottom: 12,
@@ -222,12 +222,12 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1e293b',
+    color: '#78350f',
     marginBottom: 4,
   },
   actionSubtitle: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#92400e',
     lineHeight: 16,
   },
   activitySection: {

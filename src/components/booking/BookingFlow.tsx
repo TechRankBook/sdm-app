@@ -289,7 +289,7 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fffbeb',
   },
   contentContainer: {
     flex: 1,
@@ -301,7 +301,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fffbeb',
   },
   stepContainer: {
     flex: 1,
