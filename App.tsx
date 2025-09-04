@@ -1,19 +1,68 @@
+import React, { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+// Import NativeWind CSS
+import 'nativewind';
+
+// Import global styles
+import './src/global.css';
+
+// Import our services and stores
+import { AuthService } from '@/services/supabase/auth';
+import { useAppStore } from '@/stores/appStore';
+
+// Import hooks
+import { useRealtimeSubscriptions } from '@/hooks/useRealtimeSubscriptions';
+
+// Import navigation
+import AppNavigator from '@/navigation/AppNavigator';
 
 export default function App() {
+  const { isLoading, isAuthenticated } = useAppStore();
+
+  // Initialize real-time subscriptions
+  useRealtimeSubscriptions();
+
+  useEffect(() => {
+    // Initialize auth state listener
+    AuthService.initializeAuthListener();
+
+    // Check if user is already authenticated
+    const initializeAuth = async () => {
+      const authenticated = await AuthService.isAuthenticated();
+      useAppStore.getState().setAuthenticated(authenticated);
+      useAppStore.getState().setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#3b82f6" />
+        <StatusBar style="dark" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <SafeAreaProvider>
+      <NavigationContainer>
+        <AppNavigator />
+        <StatusBar style="dark" />
+      </NavigationContainer>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  loadingContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff',
     alignItems: 'center',
     justifyContent: 'center',
   },
