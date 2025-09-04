@@ -7,6 +7,7 @@ import { LocationStep } from '@/components/booking/LocationStep';
 import { DateTimeStep } from '@/components/booking/DateTimeStep';
 import { VehiclePassengerStep } from '@/components/booking/VehiclePassengerStep';
 import { ConfirmationStep } from '@/components/booking/ConfirmationStep';
+import { PaymentStep } from '@/components/booking/PaymentStep';
 
 interface LocationData {
   lat: number;
@@ -20,7 +21,7 @@ interface BookingFlowProps {
 
 export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) => {
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   // Animation refs
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -96,7 +97,8 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
     'Locations',
     'Date & Time',
     'Vehicle',
-    'Confirm'
+    'Confirm',
+    'Payment'
   ];
 
   const handleNext = () => {
@@ -129,6 +131,11 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
   };
 
   const handleConfirmBooking = () => {
+    // Move to payment step instead of completing booking
+    handleNext();
+  };
+
+  const handlePaymentSuccess = (paymentDetails: any) => {
     const bookingData = {
       serviceType,
       tripType,
@@ -146,6 +153,7 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
       luggageCount,
       hasPet,
       additionalInstructions,
+      paymentDetails,
     };
 
     onBookingComplete(bookingData);
@@ -230,6 +238,31 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
             onHasPetChange={setHasPet}
             onAdditionalInstructionsChange={setAdditionalInstructions}
             onConfirm={handleConfirmBooking}
+            onBack={handleBack}
+          />
+        );
+      case 6:
+        return (
+          <PaymentStep
+            bookingData={{
+              serviceType,
+              tripType,
+              isRoundTrip,
+              pickupLocation,
+              dropoffLocation,
+              pickupCoords,
+              dropoffCoords,
+              scheduledDate,
+              scheduledTime,
+              returnDate,
+              returnTime,
+              passengers,
+              vehicleType,
+              luggageCount,
+              hasPet,
+              additionalInstructions,
+            }}
+            onPaymentSuccess={handlePaymentSuccess}
             onBack={handleBack}
           />
         );
