@@ -165,7 +165,11 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
         return (
           <ServiceTypeStep
             serviceType={serviceType}
+            tripType={tripType}
+            isRoundTrip={isRoundTrip}
             onServiceTypeChange={handleServiceTypeChange}
+            onTripTypeChange={handleTripTypeChange}
+            onRoundTripChange={setIsRoundTrip}
             onNext={handleNext}
           />
         );
@@ -281,6 +285,7 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
             dropoffLocation={dropoffCoords}
             height={300}
             interactive={currentStep === 2} // Only interactive on location step
+            showLocationButtons={true} // Always show location picking buttons
             onPickupChange={(location) => {
               setPickupCoords(location);
               setPickupLocation(location.address);
@@ -300,6 +305,7 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={true}
             keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="on-drag"
           >
             <Animated.View
               style={[

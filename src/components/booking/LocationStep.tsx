@@ -128,7 +128,7 @@ export const LocationStep: React.FC<LocationStepProps> = ({
 
   return (
     <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.header}>
           <Text style={styles.title}>Select Locations</Text>
           <Text style={styles.subtitle}>Choose your pickup and drop-off locations</Text>
@@ -267,31 +267,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
+    position: 'relative',
   },
   header: {
-    padding: 20,
+    padding: 16,
     alignItems: 'center',
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1e293b',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#64748b',
     textAlign: 'center',
   },
   locationSection: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: 8,
+    marginBottom: 8,
   },
   locationLabel: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#1e293b',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   terminalContainer: {
     flexDirection: 'row',
@@ -299,9 +300,9 @@ const styles = StyleSheet.create({
   },
   terminalButton: {
     flex: 1,
-    padding: 16,
+    padding: 12,
     backgroundColor: '#ffffff',
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 2,
     borderColor: '#e2e8f0',
     alignItems: 'center',
@@ -311,7 +312,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#eff6ff',
   },
   terminalText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '500',
     color: '#475569',
   },
@@ -319,46 +320,47 @@ const styles = StyleSheet.create({
     color: '#2563eb',
   },
   errorText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#dc2626',
-    marginTop: 8,
+    marginTop: 6,
   },
   footer: {
-    padding: 20,
-    paddingBottom: 40,
+    padding: 16,
+    paddingBottom: 32,
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#e2e8f0',
+    zIndex: 0,
   },
   buttonContainer: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   backButton: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e2e8f0',
   },
   backButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#475569',
   },
   nextButton: {
     flex: 2,
     backgroundColor: '#2563eb',
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: 12,
+    borderRadius: 8,
     alignItems: 'center',
   },
   nextButtonDisabled: {
     backgroundColor: '#cbd5e1',
   },
   nextButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#ffffff',
   },

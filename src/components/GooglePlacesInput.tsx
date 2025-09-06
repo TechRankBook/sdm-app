@@ -229,6 +229,19 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
           }}
         />
         {isLoading && <Text style={styles.loadingText}>...</Text>}
+        {value.length > 0 && !isLoading && (
+          <TouchableOpacity
+            style={styles.clearButton}
+            onPress={() => {
+              onChange('');
+              setPredictions([]);
+              setShowPredictions(false);
+              inputRef.current?.focus();
+            }}
+          >
+            <MaterialIcons name="clear" size={16} color="#64748b" />
+          </TouchableOpacity>
+        )}
       </View>
 
       {showPredictions && predictions.length > 0 && (
@@ -268,9 +281,9 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
               size={16}
               color={isGettingLocation ? "#64748b" : "#2563eb"}
             />
-            <Text style={[styles.currentLocationText, isGettingLocation && styles.currentLocationTextDisabled]}>
+            {/* <Text style={[styles.currentLocationText, isGettingLocation && styles.currentLocationTextDisabled]}>
               {isGettingLocation ? 'Getting Location...' : 'Use Current Location'}
-            </Text>
+            </Text> */}
           </View>
         </TouchableOpacity>
       )}
@@ -281,15 +294,21 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
+    flexDirection: 'row',
+    width: '100%',
+    gap: 4,
+    zIndex: 1,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    padding: 16,
+    padding: 4,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#e2e8f0',
+    flex: 1,
+    width: '100%',
   },
   inputIcon: {
     marginRight: 12,
@@ -302,9 +321,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#64748b',
   },
+  clearButton: {
+    marginLeft: 8,
+    padding: 4,
+  },
   predictionsContainer: {
     position: 'absolute',
-    top: '100%',
+    bottom: 48,
     left: 0,
     right: 0,
     backgroundColor: '#ffffff',
@@ -318,24 +341,24 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    elevation: 10,
-    zIndex: 1000,
+    elevation: 50,
+    zIndex: 9999,
     maxHeight: 240,
   },
   predictionItem: {
-    padding: 16,
+    padding: 8,
     borderBottomWidth: 1,
     borderBottomColor: '#e2e8f0',
   },
   predictionMainText: {
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: '500',
     color: '#1e293b',
   },
   predictionSecondaryText: {
-    fontSize: 14,
+    fontSize: 10,
     color: '#64748b',
-    marginTop: 4,
+    marginTop: 2,
   },
   currentLocationButton: {
     marginTop: 8,

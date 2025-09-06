@@ -27,6 +27,7 @@ interface GoogleMapProps {
   onPickupChange?: (location: LocationData) => void;
   onDropoffChange?: (location: LocationData) => void;
   activeMarker?: 'pickup' | 'dropoff';
+  showLocationButtons?: boolean;
 }
 
 export const GoogleMap: React.FC<GoogleMapProps> = ({
@@ -38,6 +39,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   onPickupChange,
   onDropoffChange,
   activeMarker = 'pickup',
+  showLocationButtons = false,
 }) => {
   const mapRef = useRef<MapView>(null);
   const [routeCoordinates, setRouteCoordinates] = useState<any[]>([]);
@@ -45,6 +47,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   const [currentLocation, setCurrentLocation] = useState<LocationData | null>(null);
   const [region, setRegion] = useState<any>(null);
   const [isLocationLoading, setIsLocationLoading] = useState(true);
+  const [mapActiveMarker, setMapActiveMarker] = useState<'pickup' | 'dropoff'>(activeMarker);
 
   // Get current location
   const getCurrentLocation = async () => {
@@ -279,7 +282,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   };
 
   const handleMapPress = async (event: any) => {
-    if (!interactive) return;
+    if (!interactive && !showLocationButtons) return;
 
     const { coordinate } = event.nativeEvent;
     const location: LocationData = {
@@ -302,9 +305,9 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       console.error('Reverse geocoding error:', error);
     }
 
-    if (activeMarker === 'pickup' && onPickupChange) {
+    if (mapActiveMarker === 'pickup' && onPickupChange) {
       onPickupChange(location);
-    } else if (activeMarker === 'dropoff' && onDropoffChange) {
+    } else if (mapActiveMarker === 'dropoff' && onDropoffChange) {
       onDropoffChange(location);
     }
   };
@@ -356,10 +359,10 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
         region={region || getMapRegion()}
         onPress={handleMapPress}
         showsUserLocation={true}
-        showsMyLocationButton={interactive}
-        zoomEnabled={interactive}
-        scrollEnabled={interactive}
-        rotateEnabled={interactive}
+        showsMyLocationButton={interactive || showLocationButtons}
+        zoomEnabled={interactive || showLocationButtons}
+        scrollEnabled={interactive || showLocationButtons}
+        rotateEnabled={interactive || showLocationButtons}
         loadingEnabled={true}
         loadingIndicatorColor="#2563eb"
         loadingBackgroundColor="#ffffff"
@@ -434,11 +437,46 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       )}
 
       {/* Interactive Mode Indicator */}
-      {interactive && (
+      {(interactive || showLocationButtons) && (
         <View style={styles.interactiveIndicator}>
           <Text style={styles.interactiveText}>
-            Tap map to set {activeMarker === 'pickup' ? 'pickup' : 'drop-off'} location
+            Tap map to set {mapActiveMarker === 'pickup' ? 'pickup' : 'drop-off'} location
           </Text>
+        </View>
+      )}
+
+      {/* Location Picking Buttons */}
+      {showLocationButtons && (
+        <View style={styles.locationButtonsContainer}>
+          <TouchableOpacity
+            style={[
+              styles.locationButton,
+              mapActiveMarker === 'pickup' && styles.locationButtonActive,
+            ]}
+            onPress={() => setMapActiveMarker('pickup')}
+          >
+            <Text style={[
+              styles.locationButtonText,
+              mapActiveMarker === 'pickup' && styles.locationButtonTextActive,
+            ]}>
+              Set Pickup Location
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.locationButton,
+              mapActiveMarker === 'dropoff' && styles.locationButtonActive,
+            ]}
+            onPress={() => setMapActiveMarker('dropoff')}
+          >
+            <Text style={[
+              styles.locationButtonText,
+              mapActiveMarker === 'dropoff' && styles.locationButtonTextActive,
+            ]}>
+              Set Drop-off Location
+            </Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -487,5 +525,43 @@ const styles = StyleSheet.create({
   interactiveText: {
     fontSize: 12,
     color: '#475569',
+  },
+  locationButtonsContainer: {
+    position: 'absolute',
+    bottom: 16,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    gap: 8,
+  },
+  locationButton: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  locationButtonActive: {
+    borderColor: '#f59e0b',
+    backgroundColor: '#fef3c7',
+  },
+  locationButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#475569',
+  },
+  locationButtonTextActive: {
+    color: '#92400e',
   },
 });

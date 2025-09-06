@@ -347,24 +347,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#fffbeb',
   },
   header: {
-    padding: 20,
+    padding: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#92400e',
     marginBottom: 4,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#b45309',
   },
   card: {
     backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    marginBottom: 16,
-    padding: 20,
-    borderRadius: 12,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 16,
+    borderRadius: 8,
     shadowColor: '#f59e0b',
     shadowOffset: {
       width: 0,
@@ -377,10 +377,10 @@ const styles = StyleSheet.create({
     borderColor: '#fef3c7',
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
     color: '#92400e',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   paymentAmountContainer: {
     gap: 12,
@@ -388,8 +388,8 @@ const styles = StyleSheet.create({
   paymentAmountOption: {
     borderWidth: 2,
     borderColor: '#e5e7eb',
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: 6,
+    padding: 12,
     position: 'relative',
   },
   paymentAmountOptionSelected: {
@@ -400,10 +400,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   paymentAmountTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#374151',
   },
@@ -411,14 +411,14 @@ const styles = StyleSheet.create({
     color: '#92400e',
   },
   paymentAmountValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#f59e0b',
   },
   paymentAmountDescription: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6b7280',
-    marginTop: 4,
+    marginTop: 2,
   },
   selectedIcon: {
     position: 'absolute',
@@ -431,23 +431,23 @@ const styles = StyleSheet.create({
   paymentMethodOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 12,
     borderWidth: 2,
     borderColor: '#e5e7eb',
-    borderRadius: 8,
+    borderRadius: 6,
   },
   paymentMethodOptionSelected: {
     borderColor: '#f59e0b',
     backgroundColor: '#fffbeb',
   },
   paymentMethodIcon: {
-    marginRight: 16,
+    marginRight: 12,
   },
   paymentMethodDetails: {
     flex: 1,
   },
   paymentMethodName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     color: '#374151',
     marginBottom: 2,
@@ -456,7 +456,7 @@ const styles = StyleSheet.create({
     color: '#92400e',
   },
   paymentMethodDescription: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#6b7280',
   },
   termsContainer: {
@@ -475,14 +475,14 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   buttonContainer: {
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    gap: 12,
+    paddingHorizontal: 16,
+    paddingBottom: 32,
+    gap: 8,
   },
   payButton: {
     backgroundColor: '#f59e0b',
-    paddingVertical: 16,
-    borderRadius: 8,
+    paddingVertical: 12,
+    borderRadius: 6,
     alignItems: 'center',
   },
   payButtonDisabled: {
@@ -491,22 +491,22 @@ const styles = StyleSheet.create({
   payButtonContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   payButtonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   payButtonTextProcessing: {
     marginLeft: 0,
   },
   backButton: {
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
   },
   backButtonText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '500',
     color: '#b45309',
   },
@@ -517,12 +517,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    gap: 8,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 6,
   },
   securityText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#b45309',
     textAlign: 'center',
   },
