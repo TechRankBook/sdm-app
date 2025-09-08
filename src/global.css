@@ -3,77 +3,81 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 45 100% 50%;
-    --primary-foreground: 0 0% 0%;
-    --secondary: 45 100% 95%;
-    --secondary-foreground: 0 0% 20%;
-    --muted: 45 50% 90%;
-    --muted-foreground: 0 0% 45%;
-    --accent: 45 100% 90%;
-    --accent-foreground: 0 0% 20%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+ :root {
+ /* Eco-friendly Green (80%) */
+ --background: 120 15% 95%; /* A very light green for the background */
+ --foreground: 120 20% 15%; /* A dark green for text */
+ --card: 120 15% 98%;
+ --card-foreground: 120 20% 15%;
+ --popover: 120 15% 98%;
+ --popover-foreground: 120 20% 15%;
+ --primary: 120 40% 40%; /* A deep, earthy green for primary actions */
+ --primary-foreground: 0 0% 100%;
+ --border: 120 10% 85%;
+ --input: 120 10% 85%;
+ --ring: 120 40% 40%;
 
-    /* Glass morphism variables */
-    --glass-bg: 0 0% 100% / 0.8;
-    --glass-border: 0 0% 100% / 0.2;
-    --glass-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+ /* Purple (15%) */
+ --secondary: 270 50% 90%; /* A light purple for secondary elements */
+ --secondary-foreground: 270 40% 20%;
+ --muted: 270 20% 95%; /* A very light purple for subtle UI */
+ --muted-foreground: 270 15% 50%;
+ --accent: 270 60% 70%; /* A more vibrant purple for accents */
+ --accent-foreground: 270 40% 15%;
 
-    /* Gradient variables */
-    --gradient-primary: linear-gradient(135deg, hsl(45 100% 50%) 0%, hsl(35 100% 60%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(45 100% 95%) 0%, hsl(45 100% 90%) 100%);
-    --gradient-surface: linear-gradient(135deg, hsl(0 0% 100%) 0%, hsl(45 100% 95%) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(45 100% 50%) 0%, hsl(35 100% 60%) 50%, hsl(25 100% 70%) 100%);
+ /* White (5%) */
+ --destructive: 0 84.2% 60.2%;
+ --destructive-foreground: 210 40% 98%;
+ --radius: 0.5rem;
 
-    /* Shadow variables */
-    --shadow-glass: 0 8px 32px rgba(31, 38, 135, 0.37);
-    --shadow-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
-  }
+ /* Glass morphism variables */
+ --glass-bg: 120 15% 95% / 0.8;
+ --glass-border: 120 10% 85% / 0.5;
+ --glass-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
-
-    /* Glass morphism variables for dark mode */
-    --glass-bg: 222.2 84% 4.9% / 0.8;
-    --glass-border: 217.2 32.6% 17.5% / 0.2;
-    --glass-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-
-    /* Shadow variables for dark mode */
-    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
-    --shadow-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-    --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.5);
-  }
+ /* Shadow variables */
+ --shadow-glass: 0 8px 32px rgba(31, 135, 38, 0.37);
+ --shadow-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+ --shadow-glow: 0 0 20px rgba(135, 31, 135, 0.3);
+ }
 }
+
+.dark {
+ /* Eco-friendly Green (80%) */
+ --background: 120 20% 10%;
+ --foreground: 120 15% 90%;
+ --card: 120 20% 12%;
+ --card-foreground: 120 15% 90%;
+ --popover: 120 20% 12%;
+ --popover-foreground: 120 15% 90%;
+ --primary: 120 40% 45%;
+ --primary-foreground: 0 0% 100%;
+ --border: 120 15% 20%;
+ --input: 120 15% 20%;
+ --ring: 120 40% 45%;
+
+ /* Purple (15%) */
+ --secondary: 270 50% 25%;
+ --secondary-foreground: 270 50% 90%;
+ --muted: 270 20% 20%;
+ --muted-foreground: 270 15% 70%;
+ --accent: 270 60% 40%;
+ --accent-foreground: 270 40% 95%;
+
+ /* White (5%) */
+ --destructive: 0 62.8% 30.6%;
+ --destructive-foreground: 210 40% 98%;
+
+ /* Glass morphism variables for dark mode */
+ --glass-bg: 120 20% 10% / 0.8;
+ --glass-border: 120 15% 20% / 0.2;
+ --glass-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+
+ /* Shadow variables for dark mode */
+ --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+ --shadow-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+ --shadow-glow: 0 0 20px rgba(135, 31, 135, 0.5);
+ }
 
 @layer components {
   .glass {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 // Import services and stores
 import { AuthService } from '../../services/supabase/auth';
 import { useAppStore } from '../../stores/appStore';
+
+// Import error message utilities
+import { getUserFriendlyError } from '../../utils/errorMessages';
 
 // Import types
 import { AuthStackParamList } from '@/types/navigation';
@@ -48,6 +51,45 @@ export default function OTPVerificationScreen() {
   const [otp, setOtp] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Timer state for resend OTP restriction
+  const [resendTimer, setResendTimer] = useState(0);
+  const [canResend, setCanResend] = useState(true);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const RESEND_COOLDOWN = 60; // 60 seconds cooldown
+
+  // Timer effect for countdown
+  useEffect(() => {
+    if (resendTimer > 0) {
+      timerRef.current = setTimeout(() => {
+        setResendTimer(prev => prev - 1);
+      }, 1000);
+    } else {
+      setCanResend(true);
+    }
+
+    // Cleanup timer on unmount or when timer reaches 0
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, [resendTimer]);
+
+  // Start resend cooldown timer
+  const startResendCooldown = () => {
+    setCanResend(false);
+    setResendTimer(RESEND_COOLDOWN);
+  };
+
+  // Cleanup timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
   const handleVerifyOTP = async () => {
     if (!otp.trim()) {
       Alert.alert('Error', 'Please enter the OTP');
@@ -66,14 +108,14 @@ export default function OTPVerificationScreen() {
       const { data, error } = await AuthService.verifyPhoneOTP(phoneNumber, otp);
 
       if (error) {
-        Alert.alert('Verification Failed', error.message || 'Invalid OTP code');
+        Alert.alert('Verification Failed', getUserFriendlyError(error));
       } else {
         // Navigation will be handled automatically by the auth state listener
         console.log('OTP verification successful');
       }
     } catch (error) {
       console.error('OTP verification error:', error);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      Alert.alert('Error', getUserFriendlyError(error as Error));
     } finally {
       setIsLoading(false);
       setLoading(false);
@@ -81,23 +123,28 @@ export default function OTPVerificationScreen() {
   };
 
   const handleResendOTP = async () => {
+    if (!canResend) {
+      Alert.alert('Please Wait', `You can resend OTP in ${resendTimer} seconds`);
+      return;
+    }
+
     setIsLoading(true);
-    setLoading(true);
 
     try {
       const { data, error } = await AuthService.signInWithPhone(phoneNumber);
 
       if (error) {
-        Alert.alert('Error', error.message || 'Failed to resend OTP');
+        Alert.alert('Error', getUserFriendlyError(error));
       } else {
         Alert.alert('OTP Sent', 'A new verification code has been sent to your phone');
+        // Start cooldown timer after successful send
+        startResendCooldown();
       }
     } catch (error) {
       console.error('Resend OTP error:', error);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      Alert.alert('Error', getUserFriendlyError(error as Error));
     } finally {
       setIsLoading(false);
-      setLoading(false);
     }
   };
 
@@ -129,7 +176,7 @@ export default function OTPVerificationScreen() {
           <View style={styles.form}>
             {/* OTP Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Verification Code</Text>
+              {/* <Text style={styles.label}>Verification Code</Text> */}
               <TextInput
                 style={styles.input}
                 placeholder="Enter 6-digit OTP"
@@ -158,10 +205,15 @@ export default function OTPVerificationScreen() {
             {/* Resend OTP */}
             <TouchableOpacity
               onPress={handleResendOTP}
-              style={styles.resendButton}
-              disabled={isLoading}
+              style={[styles.resendButton, (!canResend || isLoading) && styles.resendButtonDisabled]}
+              disabled={!canResend || isLoading}
             >
-              <Text style={styles.resendText}>Didn't receive code? Resend OTP</Text>
+              <Text style={[styles.resendText, (!canResend || isLoading) && styles.resendTextDisabled]}>
+                {canResend
+                  ? "Didn't receive code? Resend OTP"
+                  : `Resend OTP in ${resendTimer}s`
+                }
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -248,10 +300,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 16,
   },
+  resendButtonDisabled: {
+    opacity: 0.5,
+  },
   resendText: {
     color: '#2563eb',
     fontSize: 14,
     fontWeight: '500',
+  },
+  resendTextDisabled: {
+    color: '#64748b',
   },
   footer: {
     flexDirection: 'row',

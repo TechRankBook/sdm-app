@@ -38,7 +38,7 @@ export default function AuthNavigator() {
         component={OTPVerificationScreen}
         options={{
           title: 'Verify Phone',
-          headerShown: true
+          headerShown: false
         }}
       />
       <Stack.Screen

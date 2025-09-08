@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -18,6 +18,9 @@ import { CommonActions } from '@react-navigation/native';
 import { AuthService } from '../../services/supabase/auth';
 import { useAppStore } from '../../stores/appStore';
 
+// Import error message utilities
+import { getUserFriendlyError } from '../../utils/errorMessages';
+
 // Import types
 import { AuthStackParamList } from '@/types/navigation';
 
@@ -30,7 +33,51 @@ export default function AuthFlowScreen() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  // Timer state for resend OTP restriction
+  const [sendTimer, setSendTimer] = useState(0);
+  const [canSend, setCanSend] = useState(true);
+  const sendTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const SEND_COOLDOWN = 60; // 60 seconds cooldown
+
+  // Timer effect for countdown
+  useEffect(() => {
+    if (sendTimer > 0) {
+      sendTimerRef.current = setTimeout(() => {
+        setSendTimer(prev => prev - 1);
+      }, 1000);
+    } else {
+      setCanSend(true);
+    }
+
+    // Cleanup timer on unmount or when timer reaches 0
+    return () => {
+      if (sendTimerRef.current) {
+        clearTimeout(sendTimerRef.current);
+      }
+    };
+  }, [sendTimer]);
+
+  // Start send cooldown timer
+  const startSendCooldown = () => {
+    setCanSend(false);
+    setSendTimer(SEND_COOLDOWN);
+  };
+
+  // Cleanup timer when component unmounts
+  useEffect(() => {
+    return () => {
+      if (sendTimerRef.current) {
+        clearTimeout(sendTimerRef.current);
+      }
+    };
+  }, []);
+
   const handleSendOTP = async () => {
+    if (!canSend) {
+      Alert.alert('Please Wait', `You can send OTP again in ${sendTimer} seconds`);
+      return;
+    }
+
     if (!phoneNumber.trim()) {
       Alert.alert('Error', 'Please enter your phone number');
       return;
@@ -48,10 +95,9 @@ export default function AuthFlowScreen() {
       const { data, error } = await AuthService.signInWithPhone(phoneNumber.trim());
 
       if (error) {
-        Alert.alert('Error', `Failed to send OTP: ${error.message || 'Unknown error'}`);
+        Alert.alert('Error', getUserFriendlyError(error));
       } else {
         console.log('OTP sent successfully, navigating to OTPVerification');
-        Alert.alert('Navigation', 'Attempting to navigate to OTP verification screen...');
 
         console.log('Navigation object:', navigation);
         console.log('Navigation type:', typeof navigation);
@@ -85,11 +131,12 @@ export default function AuthFlowScreen() {
             console.log('Navigation reset fallback successful');
           }
         }
-        Alert.alert('Success', 'Navigation attempted! Check if screen changed.');
+        // Start cooldown timer after successful send
+        startSendCooldown();
       }
     } catch (error) {
       console.error('Send OTP error:', error);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      Alert.alert('Error', getUserFriendlyError(error as Error));
     } finally {
       setIsLoading(false);
       // Don't call setLoading(false) to avoid re-rendering AppNavigator
@@ -111,7 +158,7 @@ export default function AuthFlowScreen() {
       }
     } catch (error) {
       console.error('Google sign-in error:', error);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      Alert.alert('Error', getUserFriendlyError(error as Error));
     } finally {
       setIsLoading(false);
       // Don't call setLoading(false) to avoid re-rendering AppNavigator
@@ -140,9 +187,9 @@ export default function AuthFlowScreen() {
         <View style={styles.content}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.title}>Welcome to SDM</Text>
             <Text style={styles.subtitle}>
-              Sign in to your SDM Cab Hailing account
+              Get in to your SDM emobility Services account.
             </Text>
           </View>
 
@@ -168,23 +215,28 @@ export default function AuthFlowScreen() {
               </View>
             </View>
 
-            {/* Forgot Password */}
+            {/* Forgot Password
             <TouchableOpacity
               onPress={handleForgotPassword}
               style={styles.forgotPassword}
               disabled={isLoading}
             >
               <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             {/* Send OTP Button */}
             <TouchableOpacity
               onPress={handleSendOTP}
-              style={[styles.button, isLoading && styles.buttonDisabled]}
-              disabled={isLoading}
+              style={[styles.button, (isLoading || !canSend) && styles.buttonDisabled]}
+              disabled={isLoading || !canSend}
             >
               <Text style={styles.buttonText}>
-                {isLoading ? 'Sending OTP...' : 'Send OTP'}
+                {isLoading
+                  ? 'Sending OTP...'
+                  : !canSend
+                    ? `Send OTP in ${sendTimer}s`
+                    : 'Send OTP'
+                }
               </Text>
             </TouchableOpacity>
           </View>
