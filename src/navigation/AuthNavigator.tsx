@@ -2,8 +2,8 @@ import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // Import screens
-import LoginScreen from '@/screens/auth/LoginScreen';
-import RegisterScreen from '@/screens/auth/RegisterScreen';
+import AuthFlowScreen from '@/screens/auth/AuthFlowScreen';
+import OTPVerificationScreen from '@/screens/auth/OTPVerificationScreen';
 import ForgotPasswordScreen from '@/screens/auth/ForgotPasswordScreen';
 
 // Import types
@@ -27,18 +27,18 @@ export default function AuthNavigator() {
     >
       <Stack.Screen
         name="Login"
-        component={LoginScreen}
+        component={AuthFlowScreen}
         options={{
           title: 'Sign In',
           headerShown: false
         }}
       />
       <Stack.Screen
-        name="Register"
-        component={RegisterScreen}
+        name="OTPVerification"
+        component={OTPVerificationScreen}
         options={{
-          title: 'Create Account',
-          headerShown: false
+          title: 'Verify Phone',
+          headerShown: true
         }}
       />
       <Stack.Screen

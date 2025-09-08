@@ -24,33 +24,33 @@ type ForgotPasswordScreenNavigationProp = StackNavigationProp<AuthStackParamList
 export default function ForgotPasswordScreen() {
   const navigation = useNavigation<ForgotPasswordScreenNavigationProp>();
 
-  const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
 
   const handleResetPassword = async () => {
-    if (!email.trim()) {
-      Alert.alert('Error', 'Please enter your email address');
+    if (!phoneNumber.trim()) {
+      Alert.alert('Error', 'Please enter your phone number');
       return;
     }
 
-    if (!AuthService.isValidEmail(email)) {
-      Alert.alert('Error', 'Please enter a valid email address');
+    if (!AuthService.isValidPhone(phoneNumber)) {
+      Alert.alert('Error', 'Please enter a valid 10-digit phone number');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const { error } = await AuthService.resetPassword(email.trim());
+      const { error } = await AuthService.signInWithPhone(phoneNumber.trim());
 
       if (error) {
-        Alert.alert('Error', error.message || 'Failed to send reset email');
+        Alert.alert('Error', error.message || 'Failed to send OTP');
       } else {
         setEmailSent(true);
         Alert.alert(
-          'Reset Email Sent',
-          'Please check your email for password reset instructions.',
+          'OTP Sent',
+          'Please check your phone for verification code.',
           [
             {
               text: 'OK',
@@ -60,7 +60,7 @@ export default function ForgotPasswordScreen() {
         );
       }
     } catch (error) {
-      console.error('Reset password error:', error);
+      console.error('Send OTP error:', error);
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
@@ -92,19 +92,24 @@ export default function ForgotPasswordScreen() {
 
           {/* Form */}
           <View style={styles.form}>
-            {/* Email Input */}
+            {/* Phone Input */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email Address</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your email"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!isLoading}
-              />
+              <Text style={styles.label}>Phone Number</Text>
+              <View style={styles.phoneInputContainer}>
+                <Text style={styles.countryCode}>+91</Text>
+                <TextInput
+                  style={styles.phoneInput}
+                  placeholder="Enter 10-digit phone number"
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  keyboardType="phone-pad"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  editable={!isLoading}
+                  maxLength={10}
+                  placeholderTextColor="#64748b"
+                />
+              </View>
             </View>
 
             {/* Reset Button */}
@@ -209,5 +214,27 @@ const styles = StyleSheet.create({
   footerLink: {
     color: '#2563eb',
     fontWeight: '600',
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    backgroundColor: '#ffffff',
+  },
+  countryCode: {
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#374151',
+    borderRightWidth: 1,
+    borderRightColor: '#d1d5db',
+  },
+  phoneInput: {
+    flex: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
   },
 });

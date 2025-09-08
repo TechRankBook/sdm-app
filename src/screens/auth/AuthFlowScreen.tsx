@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { CommonActions } from '@react-navigation/native';
 
 // Import services and stores
 import { AuthService } from '../../services/supabase/auth';
@@ -20,10 +21,10 @@ import { useAppStore } from '../../stores/appStore';
 // Import types
 import { AuthStackParamList } from '@/types/navigation';
 
-type LoginScreenNavigationProp = StackNavigationProp<AuthStackParamList, 'Login'>;
+type AuthFlowScreenNavigationProp = StackNavigationProp<AuthStackParamList>;
 
-export default function LoginScreen() {
-  const navigation = useNavigation<LoginScreenNavigationProp>();
+export default function AuthFlowScreen() {
+  const navigation = useNavigation<AuthFlowScreenNavigationProp>();
   const { setLoading } = useAppStore();
 
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -41,33 +42,63 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    setLoading(true);
+    // Don't call setLoading from appStore to avoid re-rendering AppNavigator
 
     try {
       const { data, error } = await AuthService.signInWithPhone(phoneNumber.trim());
 
       if (error) {
-        Alert.alert('Error', error.message || 'Failed to send OTP');
+        Alert.alert('Error', `Failed to send OTP: ${error.message || 'Unknown error'}`);
       } else {
-        // Navigate to OTP verification screen
-        navigation.navigate('OTPVerification', { phoneNumber: phoneNumber.trim() });
-        Alert.alert('OTP Sent', 'Please check your phone for the verification code.');
+        console.log('OTP sent successfully, navigating to OTPVerification');
+        Alert.alert('Navigation', 'Attempting to navigate to OTP verification screen...');
+
+        console.log('Navigation object:', navigation);
+        console.log('Navigation type:', typeof navigation);
+        console.log('Navigation methods:', Object.keys(navigation));
+
+        // Try different navigation approaches
+        console.log('Current navigation state:', navigation.getState());
+
+        // Try push first (adds to stack)
+        try {
+          navigation.push('OTPVerification', { phoneNumber: phoneNumber.trim() });
+          console.log('Navigation.push called successfully');
+        } catch (pushError) {
+          console.error('Push failed:', pushError);
+          // Try replace (replaces current screen)
+          try {
+            navigation.replace('OTPVerification', { phoneNumber: phoneNumber.trim() });
+            console.log('Navigation.replace called successfully');
+          } catch (replaceError) {
+            console.error('Replace failed:', replaceError);
+            // Final fallback: reset
+            navigation.reset({
+              index: 0,
+              routes: [
+                {
+                  name: 'OTPVerification',
+                  params: { phoneNumber: phoneNumber.trim() }
+                }
+              ]
+            });
+            console.log('Navigation reset fallback successful');
+          }
+        }
+        Alert.alert('Success', 'Navigation attempted! Check if screen changed.');
       }
     } catch (error) {
       console.error('Send OTP error:', error);
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } finally {
       setIsLoading(false);
-      setLoading(false);
+      // Don't call setLoading(false) to avoid re-rendering AppNavigator
     }
-  };
-
-  const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword');
   };
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
-    setLoading(true);
+    // Don't call setLoading from appStore to avoid re-rendering AppNavigator
 
     try {
       const { data, error } = await AuthService.signInWithGoogle();
@@ -83,7 +114,16 @@ export default function LoginScreen() {
       Alert.alert('Error', 'An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
-      setLoading(false);
+      // Don't call setLoading(false) to avoid re-rendering AppNavigator
+    }
+  };
+
+  const handleForgotPassword = () => {
+    try {
+      navigation.navigate('ForgotPassword');
+    } catch (error) {
+      console.error('Navigation error:', error);
+      Alert.alert('Error', 'Unable to navigate to forgot password screen');
     }
   };
 
@@ -150,7 +190,7 @@ export default function LoginScreen() {
           </View>
 
           {/* Google Sign In */}
-          <View style={styles.googleSection}>
+          {/* <View style={styles.googleSection}>
             <View style={styles.divider}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>or</Text>
@@ -164,8 +204,7 @@ export default function LoginScreen() {
             >
               <Text style={styles.googleButtonText}>Continue with Google</Text>
             </TouchableOpacity>
-          </View>
-
+          </View> */}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -213,15 +252,6 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    backgroundColor: '#ffffff',
-  },
   phoneInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -265,19 +295,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#ffffff',
     fontSize: 16,
-    fontWeight: '600',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 32,
-  },
-  footerText: {
-    color: '#64748b',
-  },
-  footerLink: {
-    color: '#2563eb',
     fontWeight: '600',
   },
   googleSection: {

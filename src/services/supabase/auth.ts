@@ -226,4 +226,94 @@ export class AuthService {
   static isValidPassword(password: string): boolean {
     return password.length >= 8;
   }
+
+  // Sign in with phone number (send OTP)
+  static async signInWithPhone(phone: string) {
+    try {
+      const formattedPhone = this.formatPhoneNumber(phone);
+      console.log('Sending OTP to:', formattedPhone);
+
+      const { data, error } = await supabase.auth.signInWithOtp({
+        phone: formattedPhone,
+        options: {
+          shouldCreateUser: true,
+        }
+      });
+
+      if (error) throw error;
+
+      console.log('OTP sent successfully:', data);
+      return { data, error: null };
+    } catch (error) {
+      console.error('signInWithPhone error:', error);
+      return { data: null, error: error as Error };
+    }
+  }
+
+  // Verify phone OTP
+  static async verifyPhoneOTP(phone: string, otp: string) {
+    try {
+      const formattedPhone = this.formatPhoneNumber(phone);
+      console.log('Verifying OTP for:', formattedPhone);
+
+      const { data, error } = await supabase.auth.verifyOtp({
+        phone: formattedPhone,
+        token: otp.trim(),
+        type: 'sms'
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        console.log('OTP verified successfully, user signed in');
+        // Fetch and set user profile
+        const profile = await this.getUserProfile(data.user.id);
+        if (profile) {
+          useAppStore.getState().setUser(profile);
+          useAppStore.getState().setAuthenticated(true);
+        }
+        return { data, error: null };
+      }
+
+      return { data: null, error: new Error('Verification failed') };
+    } catch (error) {
+      console.error('verifyPhoneOTP error:', error);
+      return { data: null, error: error as Error };
+    }
+  }
+
+  // Sign in with Google
+  static async signInWithGoogle() {
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: 'sdmcabhailing://auth/callback'
+        }
+      });
+
+      if (error) throw error;
+      return { data, error: null };
+    } catch (error) {
+      console.error('signInWithGoogle error:', error);
+      return { data: null, error: error as Error };
+    }
+  }
+
+  // Format phone number (add +91 for India)
+  static formatPhoneNumber(phone: string): string {
+    // Remove all non-digits
+    const digits = phone.replace(/\D/g, '');
+
+    // Add country code if not present (assuming India +91)
+    if (digits.length === 10) {
+      return `+91${digits}`;
+    } else if (digits.length === 12 && digits.startsWith('91')) {
+      return `+${digits}`;
+    } else if (digits.length === 13 && digits.startsWith('91')) {
+      return `+${digits.substring(1)}`;
+    }
+
+    return phone; // Return as-is if format is unclear
+  }
 }
