@@ -4,7 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -12,6 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Toast from 'react-native-toast-message';
 
 // Import services and stores
 import { AuthService } from '../../services/supabase/auth';
@@ -41,10 +41,14 @@ export default function OTPVerificationScreen() {
     console.error('No phone number provided to OTPVerificationScreen');
     console.log('Params object:', params);
     console.log('Route params keys:', Object.keys(params || {}));
-    Alert.alert('Error', 'Phone number not found. Please try again.');
+    Toast.show({
+      type: 'error',
+      text1: 'Error',
+      text2: 'Phone number not found. Please try again.',
+    });
     setTimeout(() => {
       navigation.navigate('Login');
-    }, 2000); // Delay to show the alert
+    }, 2000); // Delay to show the toast
     return null;
   }
 
@@ -92,12 +96,20 @@ export default function OTPVerificationScreen() {
 
   const handleVerifyOTP = async () => {
     if (!otp.trim()) {
-      Alert.alert('Error', 'Please enter the OTP');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter the OTP',
+      });
       return;
     }
 
     if (otp.length !== 6) {
-      Alert.alert('Error', 'Please enter a valid 6-digit OTP');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a valid 6-digit OTP',
+      });
       return;
     }
 
@@ -108,14 +120,27 @@ export default function OTPVerificationScreen() {
       const { data, error } = await AuthService.verifyPhoneOTP(phoneNumber, otp);
 
       if (error) {
-        Alert.alert('Verification Failed', getUserFriendlyError(error));
+        Toast.show({
+          type: 'error',
+          text1: 'Verification Failed',
+          text2: getUserFriendlyError(error),
+        });
       } else {
         // Navigation will be handled automatically by the auth state listener
         console.log('OTP verification successful');
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Phone number verified successfully',
+        });
       }
     } catch (error) {
       console.error('OTP verification error:', error);
-      Alert.alert('Error', getUserFriendlyError(error as Error));
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: getUserFriendlyError(error as Error),
+      });
     } finally {
       setIsLoading(false);
       setLoading(false);
@@ -124,7 +149,11 @@ export default function OTPVerificationScreen() {
 
   const handleResendOTP = async () => {
     if (!canResend) {
-      Alert.alert('Please Wait', `You can resend OTP in ${resendTimer} seconds`);
+      Toast.show({
+        type: 'warning',
+        text1: 'Please Wait',
+        text2: `You can resend OTP in ${resendTimer} seconds`,
+      });
       return;
     }
 
@@ -134,15 +163,27 @@ export default function OTPVerificationScreen() {
       const { data, error } = await AuthService.signInWithPhone(phoneNumber);
 
       if (error) {
-        Alert.alert('Error', getUserFriendlyError(error));
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: getUserFriendlyError(error),
+        });
       } else {
-        Alert.alert('OTP Sent', 'A new verification code has been sent to your phone');
+        Toast.show({
+          type: 'success',
+          text1: 'OTP Sent',
+          text2: 'A new verification code has been sent to your phone',
+        });
         // Start cooldown timer after successful send
         startResendCooldown();
       }
     } catch (error) {
       console.error('Resend OTP error:', error);
-      Alert.alert('Error', getUserFriendlyError(error as Error));
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: getUserFriendlyError(error as Error),
+      });
     } finally {
       setIsLoading(false);
     }
@@ -282,7 +323,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
   },
   button: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#2E8B57', // Traditional forest green
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
@@ -304,7 +345,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   resendText: {
-    color: '#2563eb',
+    color: '#2E8B57', // Traditional forest green
     fontSize: 14,
     fontWeight: '500',
   },
@@ -318,7 +359,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   footerLink: {
-    color: '#2563eb',
+    color: '#2E8B57', // Traditional forest green
     fontWeight: '600',
   },
 });

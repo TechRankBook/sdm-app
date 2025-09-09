@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Toast from 'react-native-toast-message';
 
 // Import global styles
 import './src/global.css';
@@ -16,6 +17,9 @@ import { useRealtimeSubscriptions } from '@/hooks/useRealtimeSubscriptions';
 
 // Import navigation
 import AppNavigator from '@/navigation/AppNavigator';
+
+// Import toast configuration
+import { toastConfig } from '@/utils/toastConfig';
 
 export default function App() {
   const { isLoading, isAuthenticated } = useAppStore();
@@ -52,6 +56,7 @@ export default function App() {
         <AppNavigator />
         <StatusBar style="dark" />
       </NavigationContainer>
+      <Toast config={toastConfig} />
     </SafeAreaProvider>
   );
 }

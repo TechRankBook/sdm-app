@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,48 +7,523 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  Image,
+  ActivityIndicator,
+  SafeAreaView,
+  Platform,
+  Modal,
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 // Import services and stores
 import { AuthService } from '@/services/supabase/auth';
 import { useAppStore, useUser } from '@/stores/appStore';
+import { supabase } from '@/services/supabase/client';
+import { diagnoseStorageIssue, findCorrectBucketName, testNetworkConnectivity, uploadWithRestAPI, createRLSPolicyGuide } from '@/utils/storageTest';
 
-export default function DriverProfileScreen() {
+export default function DriverProfileScreen({ navigation }: { navigation: any }) {
   const user = useUser();
   const { setLoading } = useAppStore();
 
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedName, setEditedName] = useState(user?.full_name || '');
-  const [editedPhone, setEditedPhone] = useState(user?.phone || '');
+  const [isLoading, setIsLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const handleSaveProfile = async () => {
-    if (!editedName.trim()) {
-      Alert.alert('Error', 'Name cannot be empty');
-      return;
-    }
+  // User information
+  const [userName, setUserName] = useState(user?.full_name || '');
+  const [phoneNumber, setPhoneNumber] = useState(user?.phone_no || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [formattedDob, setFormattedDob] = useState('');
+  const [selectedDob, setSelectedDob] = useState<Date | null>(null);
 
-    setLoading(true);
+  // Stats
+  const [rating, setRating] = useState(0.0);
+  const [totalTrips, setTotalTrips] = useState(0);
+  const [totalEarnings, setTotalEarnings] = useState(0);
+
+  // Editing states
+  const [isEditingPersonalInfo, setIsEditingPersonalInfo] = useState(false);
+
+  // Temporary editing values
+  const [tempUserName, setTempUserName] = useState(user?.full_name || '');
+  const [tempPhoneNumber, setTempPhoneNumber] = useState(user?.phone_no || '');
+  const [tempEmail, setTempEmail] = useState(user?.email || '');
+
+  // Date picker state
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
+  const loadProfileData = async () => {
+    setIsLoading(true);
     try {
-      const { error } = await AuthService.updateProfile(user!.id, {
-        full_name: editedName.trim(),
-        phone: editedPhone.trim() || undefined,
-      });
+      // Get current user
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-      if (error) {
-        Alert.alert('Error', 'Failed to update profile');
-      } else {
-        Alert.alert('Success', 'Profile updated successfully');
-        setIsEditing(false);
+      if (sessionError) throw sessionError;
+
+      if (session?.user) {
+        // Fetch user profile
+        const profile = await AuthService.getUserProfile(session.user.id);
+
+        if (profile) {
+          setUserName(profile.full_name || '');
+          setEmail(profile.email || '');
+          setPhoneNumber(profile.phone_no || '');
+
+          // Fetch additional data
+          await fetchDriverData(session.user.id);
+          await fetchUserStats(session.user.id);
+        }
       }
+
+      setIsLoading(false);
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
-    } finally {
-      setLoading(false);
+      console.error('Error loading profile:', error);
+      Alert.alert('Error', 'Failed to load profile data');
+      setIsLoading(false);
     }
   };
 
-  const handleLogout = () => {
+  const fetchDriverData = async (userId: string) => {
+    try {
+      // Fetch driver-specific data including DOB
+      const { data, error } = await supabase
+        .from('drivers')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+        console.error('Error fetching driver data:', error);
+        return;
+      }
+
+      // Fetch profile picture if exists
+      await fetchProfileImage(userId);
+    } catch (error) {
+      console.error('Error fetching driver data:', error);
+    }
+  };
+
+  const fetchProfileImage = async (userId: string) => {
+    try {
+      // First try to get from user profile
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('profile_picture_url')
+        .eq('id', userId)
+        .single();
+
+      if (!userError && userData?.profile_picture_url) {
+        setProfileImage(`${userData.profile_picture_url}?t=${Date.now()}`);
+        return;
+      }
+
+      // Fallback: Check if profile image exists in storage
+      const { data: listData, error: listError } = await supabase
+        .storage
+        .from('drivers_profile_pictures')
+        .list(userId);
+
+      if (listError) {
+        console.error('Storage list error:', listError);
+        return;
+      }
+
+      if (listData && listData.length > 0) {
+        // Get the most recent profile image
+        const sortedFiles = listData
+          .filter(file => file.name && !file.name.startsWith('.'))
+          .sort((a: any, b: any) =>
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          );
+
+        if (sortedFiles.length > 0) {
+          const { data: { publicUrl } } = supabase
+            .storage
+            .from('drivers_profile_pictures')
+            .getPublicUrl(`${userId}/${sortedFiles[0].name}`);
+
+          if (publicUrl) {
+            // Add a timestamp to avoid caching issues
+            setProfileImage(`${publicUrl}?t=${Date.now()}`);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching profile image:', error);
+    }
+  };
+
+  const fetchUserStats = async (userId: string) => {
+    try {
+      // Using mock data for now - replace with actual Supabase query
+      setRating(4.7);
+      setTotalTrips(1247);
+      setTotalEarnings(45678.50);
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    }
+  };
+
+  const uploadProfileImage = async (uri: string) => {
+    try {
+      console.log('🚀 Starting driver profile image upload...');
+
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error('❌ Session error:', sessionError);
+        throw sessionError;
+      }
+      if (!session?.user) {
+        throw new Error('No user session found');
+      }
+
+      console.log('✅ User session found:', session.user.id);
+
+      // Convert image to blob
+      console.log('📸 Fetching image from URI:', uri);
+      const response = await fetch(uri);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      console.log('📦 Image blob size:', blob.size);
+
+      if (blob.size === 0) throw new Error('Image file is empty');
+
+      // Generate a unique filename
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
+      const filePath = `${session.user.id}/${fileName}`;
+
+      console.log('📁 Uploading to path:', filePath);
+
+      // Skip bucket validation since user confirmed bucket exists
+      console.log('🔍 Skipping bucket validation (user confirmed bucket exists)');
+      console.log('📤 Proceeding with direct upload to drivers_profile_pictures...');
+
+      // Try multiple upload methods
+      console.log('📤 Starting upload to Supabase storage...');
+
+      let uploadData, uploadError;
+
+      // Method 1: Standard Supabase upload
+      try {
+        console.log('🔄 Trying standard upload method...');
+        const result = await supabase.storage
+          .from('drivers_profile_pictures')
+          .upload(filePath, blob, {
+            contentType: 'image/jpeg',
+            upsert: true,
+            cacheControl: '3600'
+          });
+        uploadData = result.data;
+        uploadError = result.error;
+      } catch (method1Error: any) {
+        console.error('❌ Standard upload failed:', method1Error);
+
+        // Method 2: Try with different options
+        try {
+          console.log('🔄 Trying alternative upload method...');
+          const result = await supabase.storage
+            .from('drivers_profile_pictures')
+            .upload(filePath, blob, {
+              contentType: 'image/jpeg',
+              upsert: true,
+              duplex: 'half'
+            });
+          uploadData = result.data;
+          uploadError = result.error;
+        } catch (method2Error: any) {
+          console.error('❌ Alternative upload also failed:', method2Error);
+          uploadError = method2Error;
+        }
+      }
+
+      if (uploadError) {
+        console.error('❌ Upload error details:', uploadError);
+        console.error('❌ Upload error message:', uploadError.message);
+
+        // Try REST API fallback for network issues
+        if (uploadError.message?.includes('Network request failed') ||
+            uploadError.message?.includes('Failed to fetch') ||
+            uploadError.message?.includes('NetworkError') ||
+            uploadError.message?.includes('StorageUnknownError')) {
+
+          console.log('🔄 Primary upload failed, trying REST API fallback...');
+
+          try {
+            const restResult = await uploadWithRestAPI(filePath, blob);
+            if (restResult.success) {
+              console.log('✅ REST API upload successful!');
+              uploadData = restResult.data;
+              uploadError = null;
+            } else {
+              console.error('❌ REST API fallback also failed:', restResult.error);
+              throw new Error('Network connection issue. Both upload methods failed. Please check your internet connection and try again.');
+            }
+          } catch (restError: any) {
+            console.error('❌ REST API fallback error:', restError);
+            throw new Error('Network connection issue. Please check your internet connection and try again. If the problem persists, contact support.');
+          }
+        } else {
+          // Handle other types of errors
+          if (uploadError.message?.includes('Bucket not found')) {
+            throw new Error('Storage bucket not configured. Please contact support.');
+          } else if (uploadError.message?.includes('row-level security') ||
+                     uploadError.message?.includes('RLS') ||
+                     uploadError.message?.includes('violates row-level security policy')) {
+            console.log('🔒 ROOT CAUSE FOUND: RLS Policy Issue');
+            console.log('🔧 SOLUTION: Go to Supabase Dashboard > Storage > drivers_profile_pictures > Policies');
+            console.log('🔧 1. Check if RLS is enabled');
+            console.log('🔧 2. Create or update policies to allow uploads');
+            console.log('🔧 3. Or disable RLS for this bucket');
+            throw new Error('Upload blocked by security policy. Please check Supabase Storage policies for drivers_profile_pictures bucket.');
+          } else if (uploadError.message?.includes('Unauthorized') ||
+                     uploadError.message?.includes('403')) {
+            throw new Error('Upload permission denied. Please try logging out and back in.');
+          } else if (uploadError.message?.includes('Duplicate')) {
+            throw new Error('File already exists. Please try again.');
+          } else if (uploadError.message?.includes('Payload too large') ||
+                     uploadError.message?.includes('413')) {
+            throw new Error('Image file is too large. Please choose a smaller image.');
+          } else if (uploadError.message?.includes('404')) {
+            throw new Error('Storage bucket not found. Please contact support.');
+          } else if (uploadError.message?.includes('CORS')) {
+            throw new Error('CORS policy blocking upload. Please contact support.');
+          } else if (uploadError.message?.includes('timeout')) {
+            throw new Error('Upload timed out. Please check your connection and try again.');
+          } else {
+            throw new Error(`Upload failed: ${uploadError.message || 'Unknown error'}`);
+          }
+        }
+      }
+
+      console.log('✅ Upload successful:', uploadData);
+
+      // Get the public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('drivers_profile_pictures')
+        .getPublicUrl(filePath);
+
+      if (!publicUrl) {
+        throw new Error('Failed to get public URL');
+      }
+
+      console.log('🔗 Public URL generated:', publicUrl);
+
+      // Update the profile image with cache busting
+      const imageUrl = `${publicUrl}?t=${Date.now()}`;
+      setProfileImage(imageUrl);
+
+      // Update user profile with image URL
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          profile_picture_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', session.user.id);
+
+      if (updateError) {
+        console.error('⚠️ Profile update error:', updateError);
+        // Don't throw here as the image was uploaded successfully
+        Alert.alert('Warning', 'Image uploaded but profile update failed. Please refresh the page.');
+      }
+
+      console.log('🎉 Driver profile image upload completed successfully');
+      Alert.alert('Success', 'Profile image uploaded successfully!');
+    } catch (error: any) {
+      console.error('💥 Upload image error:', error);
+      console.error('💥 Error stack:', error.stack);
+
+      const errorMessage = error.message || 'Failed to upload image';
+      Alert.alert('Upload Error', errorMessage);
+    }
+  };
+
+  const pickImageFromSource = async (source: 'camera' | 'gallery') => {
+    try {
+      let result;
+
+      const options: ImagePicker.ImagePickerOptions = {
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      };
+
+      if (source === 'camera') {
+        result = await ImagePicker.launchCameraAsync(options);
+      } else {
+        result = await ImagePicker.launchImageLibraryAsync(options);
+      }
+
+      // Upload image to Supabase bucket
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        await uploadProfileImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Image picker error:', error);
+      Alert.alert('Error', 'Failed to pick image');
+    }
+  };
+
+  const showImagePickerOptions = () => {
+    Alert.alert(
+      'Profile Photo',
+      'Choose an option',
+      [
+        {
+          text: 'Take Photo',
+          onPress: () => pickImageFromSource('camera'),
+        },
+        {
+          text: 'Choose from Gallery',
+          onPress: () => pickImageFromSource('gallery'),
+        },
+        ...(profileImage ? [{
+          text: 'Remove Photo',
+          onPress: () => removeProfileImage(),
+          style: 'destructive' as 'destructive',
+        }] : []),
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+
+  const removeProfileImage = async () => {
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      if (!session?.user) throw new Error('No user session found');
+
+      // Update user profile to remove image URL
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({
+          profile_picture_url: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', session.user.id);
+
+      if (updateError) {
+        console.error('Profile update error:', updateError);
+      }
+
+      // List all files in the user's folder
+      const { data: listData, error: listError } = await supabase
+        .storage
+        .from('drivers_profile_pictures')
+        .list(session.user.id);
+
+      if (listError) {
+        console.error('Storage list error:', listError);
+        // Still clear the image even if listing fails
+        setProfileImage(null);
+        Alert.alert('Success', 'Profile image removed!');
+        return;
+      }
+
+      if (listData && listData.length > 0) {
+        // Create an array of file paths to remove
+        const filesToRemove = listData
+          .filter(file => file.name && !file.name.startsWith('.'))
+          .map(file => `${session.user.id}/${file.name}`);
+
+        if (filesToRemove.length > 0) {
+          // Remove all files
+          const { error: removeError } = await supabase.storage
+            .from('drivers_profile_pictures')
+            .remove(filesToRemove);
+
+          if (removeError) {
+            console.error('Storage remove error:', removeError);
+          }
+        }
+      }
+
+      setProfileImage(null);
+      Alert.alert('Success', 'Profile image removed successfully!');
+    } catch (error: any) {
+      console.error('Remove image error:', error);
+      const errorMessage = error.message || 'Failed to remove image';
+      Alert.alert('Remove Error', errorMessage);
+    }
+  };
+
+  const toggleEditPersonalInfo = async () => {
+    if (isEditingPersonalInfo) {
+      // Save changes
+      try {
+        if (!user) throw new Error('No user found');
+
+        // Update user profile
+        const updates = {
+          full_name: tempUserName,
+          email: tempEmail,
+        };
+
+        const { data, error } = await AuthService.updateProfile(user.id, updates);
+
+        if (error) throw error;
+
+        // Update phone number in users table
+        if (tempPhoneNumber !== user?.phone_no) {
+          const { error: phoneError } = await supabase
+            .from('users')
+            .update({
+              phone_no: tempPhoneNumber,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', user.id);
+
+          if (phoneError) console.error('Error updating phone number:', phoneError);
+        }
+
+        setUserName(tempUserName);
+        setPhoneNumber(tempPhoneNumber);
+        setEmail(tempEmail);
+        setIsEditingPersonalInfo(false);
+        Alert.alert('Success', 'Changes saved successfully!');
+      } catch (error) {
+        console.error('Update profile error:', error);
+        Alert.alert('Error', 'Failed to update profile');
+      }
+    } else {
+      // Start editing
+      setTempUserName(userName);
+      setTempPhoneNumber(phoneNumber);
+      setTempEmail(email);
+      setIsEditingPersonalInfo(true);
+    }
+  };
+
+  const selectDateOfBirth = () => {
+    setShowDatePicker(true);
+  };
+
+  const onDateChange = (event: any, date?: Date) => {
+    // For Android, hide the picker after selection
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+
+    if (date && event.type !== 'dismissed') {
+      setSelectedDob(date);
+      const formatted = `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+      setFormattedDob(formatted);
+    }
+  };
+
+  const handleLogout = async () => {
     Alert.alert(
       'Logout',
       'Are you sure you want to logout?',
@@ -61,366 +536,366 @@ export default function DriverProfileScreen() {
           text: 'Logout',
           style: 'destructive',
           onPress: async () => {
-            setLoading(true);
-            await AuthService.signOut();
-            setLoading(false);
+            try {
+              const { error } = await supabase.auth.signOut();
+
+              if (error) throw error;
+
+              Alert.alert('Success', 'You have been logged out successfully!');
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+              });
+            } catch (error) {
+              console.error('Logout error:', error);
+              Alert.alert('Error', 'Failed to logout');
+            }
           },
         },
       ]
     );
   };
 
-  // Mock driver stats
-  const driverStats = [
-    {
-      label: 'Total Rides',
-      value: '1,247',
-      icon: 'directions-car',
-      iconType: 'MaterialIcons',
-    },
-    {
-      label: 'Rating',
-      value: '4.7',
-      icon: 'star',
-      iconType: 'MaterialIcons',
-    },
-    {
-      label: 'Completion Rate',
-      value: '98%',
-      icon: 'check-circle',
-      iconType: 'MaterialIcons',
-    },
-    {
-      label: 'Member Since',
-      value: 'Jan 2024',
-      icon: 'calendar-today',
-      iconType: 'MaterialIcons',
-    },
-  ];
-
-  const menuItems = [
-    {
-      title: 'Vehicle Information',
-      subtitle: 'Manage your vehicle details',
-      icon: 'airport-shuttle',
-      iconType: 'MaterialIcons',
-      onPress: () => Alert.alert('Coming Soon', 'Vehicle management coming soon'),
-    },
-    {
-      title: 'Documents',
-      subtitle: 'License, insurance, permits',
-      icon: 'description',
-      iconType: 'MaterialIcons',
-      onPress: () => Alert.alert('Coming Soon', 'Document management coming soon'),
-    },
-    {
-      title: 'Bank Details',
-      subtitle: 'Update payment information',
-      icon: 'account-balance',
-      iconType: 'MaterialIcons',
-      onPress: () => Alert.alert('Coming Soon', 'Bank details coming soon'),
-    },
-    {
-      title: 'Notifications',
-      subtitle: 'Manage app notifications',
-      icon: 'notifications',
-      iconType: 'MaterialIcons',
-      onPress: () => Alert.alert('Coming Soon', 'Notifications settings coming soon'),
-    },
-    {
-      title: 'Support',
-      subtitle: 'Get help and contact us',
-      icon: 'help',
-      iconType: 'MaterialIcons',
-      onPress: () => Alert.alert('Coming Soon', 'Support coming soon'),
-    },
-    {
-      title: 'Settings',
-      subtitle: 'App preferences and privacy',
-      icon: 'settings',
-      iconType: 'MaterialIcons',
-      onPress: () => Alert.alert('Coming Soon', 'Settings coming soon'),
-    },
-  ];
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Profile Header */}
-      <View style={styles.header}>
-        <View style={styles.avatarContainer}>
-          <Text style={styles.avatarText}>
-            {user?.full_name?.charAt(0)?.toUpperCase() || 'D'}
-          </Text>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#1e293b" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Driver Profile</Text>
+          <View style={styles.headerSpacer} />
         </View>
-        <View style={styles.userInfo}>
-          {isEditing ? (
-            <TextInput
-              style={styles.nameInput}
-              value={editedName}
-              onChangeText={setEditedName}
-              placeholder="Enter your name"
-              autoCapitalize="words"
-              placeholderTextColor="#64748b"
-            />
-          ) : (
-            <Text style={styles.userName}>{user?.full_name || 'Driver'}</Text>
-          )}
-          <Text style={styles.userEmail}>{user?.email}</Text>
-          {isEditing ? (
-            <TextInput
-              style={styles.phoneInput}
-              value={editedPhone}
-              onChangeText={setEditedPhone}
-              placeholder="Enter phone number"
-              keyboardType="phone-pad"
-              placeholderTextColor="#64748b"
-            />
-          ) : (
-            <Text style={styles.userPhone}>
-              {user?.phone || 'No phone number'}
+
+        <View style={styles.profileSection}>
+          <TouchableOpacity onPress={showImagePickerOptions} style={styles.avatarContainer}>
+            {profileImage ? (
+              <Image source={{ uri: profileImage }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarPlaceholder}>
+                <Ionicons name="person" size={40} color="#64748b" />
+              </View>
+            )}
+            <View style={styles.cameraButton}>
+              <Ionicons name="camera" size={20} color="#fff" />
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.userName}>{userName || 'Driver'}</Text>
+          <View style={styles.ratingContainer}>
+            <Ionicons name="star" size={18} color="#f59e0b" />
+            <Text style={styles.ratingText}>
+              {rating.toFixed(1)} ({totalTrips} rides)
             </Text>
-          )}
+          </View>
         </View>
-        <TouchableOpacity
-          style={styles.editButton}
+
+        {/* Personal Information Card */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Personal Information</Text>
+            <TouchableOpacity onPress={toggleEditPersonalInfo}>
+              <Text style={styles.editButtonText}>
+                {isEditingPersonalInfo ? 'Save' : 'Edit'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.infoItem}>
+            <View style={styles.infoIcon}>
+              <MaterialIcons name="phone" size={20} color="#64748b" />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Phone Number</Text>
+              {isEditingPersonalInfo ? (
+                <TextInput
+                  style={styles.input}
+                  value={tempPhoneNumber}
+                  onChangeText={setTempPhoneNumber}
+                  placeholder="Enter phone number"
+                  keyboardType="phone-pad"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{phoneNumber || 'Not provided'}</Text>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.infoItem}>
+            <View style={styles.infoIcon}>
+              <MaterialIcons name="email" size={20} color="#64748b" />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Email</Text>
+              {isEditingPersonalInfo ? (
+                <TextInput
+                  style={styles.input}
+                  value={tempEmail}
+                  onChangeText={setTempEmail}
+                  placeholder="Enter email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{email}</Text>
+              )}
+            </View>
+          </View>
+
+          <View style={styles.infoItem}>
+            <View style={styles.infoIcon}>
+              <MaterialIcons name="person" size={20} color="#64748b" />
+            </View>
+            <View style={styles.infoContent}>
+              <Text style={styles.infoLabel}>Full Name</Text>
+              {isEditingPersonalInfo ? (
+                <TextInput
+                  style={styles.input}
+                  value={tempUserName}
+                  onChangeText={setTempUserName}
+                  placeholder="Enter your name"
+                />
+              ) : (
+                <Text style={styles.infoValue}>{userName}</Text>
+              )}
+            </View>
+          </View>
+        </View>
+
+        {/* Driver Statistics Card */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Driver Statistics</Text>
+
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{totalTrips.toLocaleString()}</Text>
+              <Text style={styles.statLabel}>Total Rides</Text>
+            </View>
+
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>{rating.toFixed(1)}</Text>
+              <Text style={styles.statLabel}>Rating</Text>
+            </View>
+
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>₹{totalEarnings.toLocaleString()}</Text>
+              <Text style={styles.statLabel}>Total Earnings</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* RLS Policy Guide Button (kept for future reference) */}
+        {/* <TouchableOpacity
+          style={[styles.logoutButton, { backgroundColor: '#8b5cf6', marginBottom: 8 }]}
           onPress={() => {
-            if (isEditing) {
-              handleSaveProfile();
-            } else {
-              setIsEditing(true);
-            }
+            Alert.alert(
+              'RLS Policy Guide',
+              'Check console logs for detailed RLS policy setup instructions.',
+              [
+                { text: 'OK', onPress: () => createRLSPolicyGuide() }
+              ]
+            );
           }}
         >
-          <Text style={styles.editButtonText}>
-            {isEditing ? 'Save' : 'Edit'}
-          </Text>
+          <Text style={[styles.logoutText, { color: '#ffffff' }]}>RLS Guide</Text>
+        </TouchableOpacity> */}
+
+        {/* Logout Button */}
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-      </View>
 
-      {/* Driver Stats */}
-      <View style={styles.statsContainer}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
-          {driverStats.map((stat, index) => (
-            <View key={index} style={styles.statItem}>
-              <View style={styles.statIcon}>
-                <MaterialIcons name={stat.icon as any} size={24} color="#64748b" />
-              </View>
-              <Text style={styles.statValue}>{stat.value}</Text>
-              <Text style={styles.statLabel}>{stat.label}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      {/* Menu Items */}
-      <View style={styles.menuContainer}>
-        {menuItems.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.menuItem}
-            onPress={item.onPress}
-          >
-            <View style={styles.menuItemLeft}>
-              <View style={styles.menuItemIcon}>
-                <MaterialIcons name={item.icon as any} size={20} color="#64748b" />
-              </View>
-              <View style={styles.menuItemText}>
-                <Text style={styles.menuItemTitle}>{item.title}</Text>
-                <Text style={styles.menuItemSubtitle}>{item.subtitle}</Text>
-              </View>
-            </View>
-            <Text style={styles.menuItemArrow}>›</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Logout Button */}
-      <View style={styles.logoutContainer}>
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-        >
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+        {/* Date Picker */}
+        {showDatePicker && (
+          <DateTimePicker
+            value={selectedDob || new Date()}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            maximumDate={new Date()}
+          />
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#f8f9fa',
   },
-  header: {
-    backgroundColor: '#ffffff',
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  avatarContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#16a34a', // Green for drivers
+  centered: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
   },
-  avatarText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#ffffff',
-  },
-  userInfo: {
+  container: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
   },
-  userName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  userEmail: {
-    fontSize: 14,
-    color: '#64748b',
-    marginBottom: 2,
-  },
-  userPhone: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  nameInput: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 8,
-  },
-  phoneInput: {
-    fontSize: 14,
-    color: '#64748b',
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  editButton: {
-    backgroundColor: '#16a34a',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  editButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  statsContainer: {
-    backgroundColor: '#ffffff',
-    margin: 20,
-    borderRadius: 12,
-    padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statIcon: {
-    marginBottom: 8,
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1e293b',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#64748b',
-    textAlign: 'center',
-  },
-  menuContainer: {
-    backgroundColor: '#ffffff',
-    marginHorizontal: 20,
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  menuItem: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingVertical: 16,
+    backgroundColor: '#ffffff',
     borderBottomWidth: 1,
-    borderBottomColor: '#f1f5f9',
+    borderBottomColor: '#e2e8f0',
   },
-  menuItemLeft: {
+  backButton: {
+    padding: 8,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#1e293b',
+  },
+  headerSpacer: {
+    width: 40,
+  },
+  profileSection: {
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 30,
+  },
+  avatarContainer: {
+    position: 'relative',
+    marginBottom: 16,
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: '#EEEEEE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cameraButton: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#000',
+    borderRadius: 18,
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#1e293b',
+  },
+  ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
-  menuItemIcon: {
-    marginRight: 16,
-    width: 24,
+  ratingText: {
+    fontSize: 14,
+    color: '#64748b',
+    marginLeft: 4,
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 16,
   },
-  menuItemText: {
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#1e293b',
+  },
+  editButtonText: {
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  infoIcon: {
+    width: 24,
+    marginRight: 12,
+  },
+  infoContent: {
     flex: 1,
   },
-  menuItemTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1e293b',
-    marginBottom: 2,
-  },
-  menuItemSubtitle: {
+  infoLabel: {
     fontSize: 12,
     color: '#64748b',
+    marginBottom: 2,
   },
-  menuItemArrow: {
-    fontSize: 18,
-    color: '#cbd5e1',
+  infoValue: {
+    fontSize: 16,
+    color: '#1e293b',
   },
-  logoutContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    paddingBottom: 40,
-  },
-  logoutButton: {
-    backgroundColor: '#dc2626',
+  input: {
+    borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 8,
-    paddingVertical: 12,
+    padding: 12,
+    fontSize: 16,
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statItem: {
     alignItems: 'center',
   },
-  logoutButtonText: {
-    color: '#ffffff',
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1e293b',
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#64748b',
+  },
+  logoutButton: {
+    backgroundColor: '#fef2f2',
+    padding: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 32,
+  },
+  logoutText: {
+    color: '#dc2626',
+    fontWeight: 'bold',
     fontSize: 16,
-    fontWeight: '600',
   },
 });

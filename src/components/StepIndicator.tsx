@@ -96,12 +96,17 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   stepCircleActive: {
-    backgroundColor: '#2563eb',
-    borderColor: '#2563eb',
+    backgroundColor: '#2dd4bf', // Teal color from the modern theme
+    borderColor: '#2dd4bf',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
   },
   stepCircleCompleted: {
-    backgroundColor: '#10b981',
-    borderColor: '#10b981',
+    backgroundColor: '#a7f3d0', // Light teal for completed steps
+    borderColor: '#2dd4bf',
   },
   stepNumber: {
     fontSize: 16,
@@ -118,11 +123,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   stepLabelActive: {
-    color: '#2563eb',
+    color: '#2dd4bf', // Teal color from the modern theme
     fontWeight: '600',
   },
   stepLabelCompleted: {
-    color: '#10b981',
+    color: '#0d9488', // Darker teal for completed step labels
   },
   connector: {
     position: 'absolute',
@@ -134,6 +139,7 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   connectorCompleted: {
-    backgroundColor: '#10b981',
+    backgroundColor: '#2dd4bf', // Teal color from the modern theme
+    height: 3,
   },
 });

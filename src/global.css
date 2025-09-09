@@ -4,26 +4,26 @@
 
 @layer base {
  :root {
- /* Eco-friendly Green (80%) */
- --background: 120 15% 95%; /* A very light green for the background */
- --foreground: 120 20% 15%; /* A dark green for text */
- --card: 120 15% 98%;
- --card-foreground: 120 20% 15%;
- --popover: 120 15% 98%;
- --popover-foreground: 120 20% 15%;
- --primary: 120 40% 40%; /* A deep, earthy green for primary actions */
+ /* Modern Teal (80%) */
+ --background: 160 15% 95%; /* A very light teal for the background */
+ --foreground: 160 20% 15%; /* A dark teal for text */
+ --card: 160 15% 98%;
+ --card-foreground: 160 20% 15%;
+ --popover: 160 15% 98%;
+ --popover-foreground: 160 20% 15%;
+ --primary: 160 53% 53%; /* #3ccfa0 - Primary teal color */
  --primary-foreground: 0 0% 100%;
- --border: 120 10% 85%;
- --input: 120 10% 85%;
- --ring: 120 40% 40%;
+ --border: 160 10% 85%;
+ --input: 160 10% 85%;
+ --ring: 160 53% 53%;
 
- /* Purple (15%) */
- --secondary: 270 50% 90%; /* A light purple for secondary elements */
- --secondary-foreground: 270 40% 20%;
- --muted: 270 20% 95%; /* A very light purple for subtle UI */
- --muted-foreground: 270 15% 50%;
- --accent: 270 60% 70%; /* A more vibrant purple for accents */
- --accent-foreground: 270 40% 15%;
+ /* Light Teal (15%) */
+ --secondary: 160 30% 90%; /* A light teal for secondary elements */
+ --secondary-foreground: 160 40% 20%;
+ --muted: 160 20% 95%; /* A very light teal for subtle UI */
+ --muted-foreground: 160 15% 50%;
+ --accent: 160 60% 70%; /* A more vibrant teal for accents */
+ --accent-foreground: 160 40% 15%;
 
  /* White (5%) */
  --destructive: 0 84.2% 60.2%;
@@ -31,52 +31,52 @@
  --radius: 0.5rem;
 
  /* Glass morphism variables */
- --glass-bg: 120 15% 95% / 0.8;
- --glass-border: 120 10% 85% / 0.5;
+ --glass-bg: 160 15% 95% / 0.8;
+ --glass-border: 160 10% 85% / 0.5;
  --glass-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 
  /* Shadow variables */
- --shadow-glass: 0 8px 32px rgba(31, 135, 38, 0.37);
+ --shadow-glass: 0 8px 32px rgba(60, 207, 160, 0.37);
  --shadow-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
- --shadow-glow: 0 0 20px rgba(135, 31, 135, 0.3);
+ --shadow-glow: 0 0 20px rgba(60, 207, 160, 0.3);
  }
 }
 
 .dark {
- /* Eco-friendly Green (80%) */
- --background: 120 20% 10%;
- --foreground: 120 15% 90%;
- --card: 120 20% 12%;
- --card-foreground: 120 15% 90%;
- --popover: 120 20% 12%;
- --popover-foreground: 120 15% 90%;
- --primary: 120 40% 45%;
+ /* Modern Teal (80%) */
+ --background: 160 20% 10%;
+ --foreground: 160 15% 90%;
+ --card: 160 20% 12%;
+ --card-foreground: 160 15% 90%;
+ --popover: 160 20% 12%;
+ --popover-foreground: 160 15% 90%;
+ --primary: 160 53% 53%; /* #3ccfa0 - Primary teal color */
  --primary-foreground: 0 0% 100%;
- --border: 120 15% 20%;
- --input: 120 15% 20%;
- --ring: 120 40% 45%;
+ --border: 160 15% 20%;
+ --input: 160 15% 20%;
+ --ring: 160 53% 53%;
 
- /* Purple (15%) */
- --secondary: 270 50% 25%;
- --secondary-foreground: 270 50% 90%;
- --muted: 270 20% 20%;
- --muted-foreground: 270 15% 70%;
- --accent: 270 60% 40%;
- --accent-foreground: 270 40% 95%;
+ /* Light Teal (15%) */
+ --secondary: 160 30% 25%;
+ --secondary-foreground: 160 30% 90%;
+ --muted: 160 20% 20%;
+ --muted-foreground: 160 15% 70%;
+ --accent: 160 60% 40%;
+ --accent-foreground: 160 40% 95%;
 
  /* White (5%) */
  --destructive: 0 62.8% 30.6%;
  --destructive-foreground: 210 40% 98%;
 
  /* Glass morphism variables for dark mode */
- --glass-bg: 120 20% 10% / 0.8;
- --glass-border: 120 15% 20% / 0.2;
+ --glass-bg: 160 20% 10% / 0.8;
+ --glass-border: 160 15% 20% / 0.2;
  --glass-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 
  /* Shadow variables for dark mode */
- --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.5);
+ --shadow-glass: 0 8px 32px rgba(60, 207, 160, 0.3);
  --shadow-elevation: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
- --shadow-glow: 0 0 20px rgba(135, 31, 135, 0.5);
+ --shadow-glow: 0 0 20px rgba(60, 207, 160, 0.5);
  }
 
 @layer components {

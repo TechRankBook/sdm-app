@@ -10,13 +10,23 @@ export type VehicleType = 'sedan' | 'suv' | 'premium' | 'hatchback';
 
 export interface User {
   id: string;
-  email: string;
-  phone?: string;
-  full_name: string;
+  email: string | null;
+  phone_no?: string | null;
+  full_name: string | null;
   role: UserRole;
-  avatar_url?: string;
+  avatar_url?: string | null;
   created_at: string;
   updated_at: string;
+  status?: 'active' | 'blocked' | 'suspended';
+  blocked_at?: string | null;
+  blocked_by?: string | null;
+  block_reason?: string | null;
+  deleted_at?: string | null;
+  last_login_at?: string | null;
+  profile_picture_url?: string | null;
+  whatsapp_phone?: string | null;
+  phone_verified?: boolean;
+  phone_verification_completed_at?: string | null;
 }
 
 export interface Customer extends User {

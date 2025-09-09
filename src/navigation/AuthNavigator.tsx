@@ -17,11 +17,17 @@ export default function AuthNavigator() {
       initialRouteName="Login"
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#2563eb',
+          backgroundColor: '#2dd4bf', // Teal color from the modern theme
+          elevation: 0,
+          shadowOpacity: 0,
         },
-        headerTintColor: '#fff',
+        headerTintColor: '#ffffff',
         headerTitleStyle: {
           fontWeight: 'bold',
+          fontSize: 18,
+        },
+        cardStyle: {
+          backgroundColor: '#f8f9fa', // Light background color
         },
       }}
     >

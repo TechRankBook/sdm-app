@@ -18,7 +18,7 @@ export class AuthService {
         options: {
           data: {
             full_name: fullName,
-            phone: phone || '',
+            phone_no: phone || '',
             role: role,
           },
         },
@@ -33,7 +33,7 @@ export class AuthService {
           .insert({
             id: data.user.id,
             email: data.user.email!,
-            phone: phone || null,
+            phone_no: phone || null,
             full_name: fullName,
             role: role,
           });

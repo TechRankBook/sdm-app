@@ -24,16 +24,23 @@ function DriverTabNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: 'hsl(var(--primary))',
-        tabBarInactiveTintColor: 'hsl(var(--muted-foreground))',
+        tabBarActiveTintColor: '#2dd4bf', // Teal color from the modern theme
+        tabBarInactiveTintColor: '#64748b', // Slate gray for inactive items
         tabBarStyle: {
-          backgroundColor: 'hsl(var(--background))',
-          borderTopColor: 'hsl(var(--border))',
+          backgroundColor: '#ffffff',
+          borderTopColor: '#e2e8f0',
+          elevation: 8,
+          shadowColor: '#000000',
+          shadowOpacity: 0.1,
+          shadowRadius: 4,
+          shadowOffset: { width: 0, height: -2 },
+          height: 60,
+          paddingBottom: 8,
         },
         headerStyle: {
-          backgroundColor: 'hsl(var(--primary))',
+          backgroundColor: '#2dd4bf', // Teal color from the modern theme
         },
-        headerTintColor: 'hsl(var(--primary-foreground))',
+        headerTintColor: '#ffffff',
         headerTitleStyle: {
           fontWeight: 'bold',
         },
@@ -105,11 +112,17 @@ export default function DriverNavigator() {
     <Stack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: '#10b981',
+          backgroundColor: '#2dd4bf', // Teal color from the modern theme
+          elevation: 0,
+          shadowOpacity: 0,
         },
-        headerTintColor: '#fff',
+        headerTintColor: '#ffffff',
         headerTitleStyle: {
           fontWeight: 'bold',
+          fontSize: 18,
+        },
+        cardStyle: {
+          backgroundColor: '#f8f9fa', // Light background color
         },
       }}
     >

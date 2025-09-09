@@ -26,61 +26,59 @@ export const ServiceTypeStep: React.FC<ServiceTypeStepProps> = ({
     { id: 'city' as ServiceType, name: 'City Ride', icon: 'location-city', iconType: 'MaterialIcons', description: 'Local city transportation' },
     { id: 'outstation' as ServiceType, name: 'Outstation', icon: 'directions-car', iconType: 'MaterialIcons', description: 'Inter-city travel' },
     { id: 'airport' as ServiceType, name: 'Airport Taxi', icon: 'flight', iconType: 'MaterialIcons', description: 'Airport transfers' },
-    { id: 'hourly' as ServiceType, name: 'Car Rentals', icon: 'schedule', iconType: 'MaterialIcons', description: 'Hourly vehicle rental' },
+    { id: 'hourly' as ServiceType, name: 'Ride Later', icon: 'schedule', iconType: 'MaterialIcons', description: 'Schedule for later' },
   ];
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Choose Your Service</Text>
-        <Text style={styles.subtitle}>Select the type of ride you need</Text>
+        <Text style={styles.title}>Book Your Ride</Text>
+        <Text style={styles.subtitle}>Enter your trip details and see available options</Text>
       </View>
      
-      <View style={styles.serviceGrid}>
-        {serviceTypes.map((service) => (
-          <TouchableOpacity
-            key={service.id}
-            style={[
-              styles.serviceCard,
-              serviceType === service.id && styles.serviceCardActive,
-            ]}
-            onPress={() => onServiceTypeChange(service.id)}
-          >
-            <View style={styles.serviceIconContainer}>
-              {service.iconType === 'MaterialIcons' ? (
-                <MaterialIcons name={service.icon as any} size={24} color="#f59e0b" />
-              ) : (
-                <Ionicons name={service.icon as any} size={24} color="#f59e0b" />
-              )}
-            </View>
-            <View style={styles.serviceContent}>
+      <View style={styles.serviceTypeContainer}>
+        <View style={styles.serviceGrid}>
+          {serviceTypes.map((service) => (
+            <TouchableOpacity
+              key={service.id}
+              style={[
+                styles.serviceCard,
+                serviceType === service.id && styles.serviceCardActive,
+              ]}
+              onPress={() => onServiceTypeChange(service.id)}
+            >
+              <View style={[
+                styles.serviceIconContainer,
+                serviceType === service.id && styles.serviceIconContainerActive
+              ]}>
+                {service.iconType === 'MaterialIcons' ? (
+                  <MaterialIcons 
+                    name={service.icon as any} 
+                    size={24} 
+                    color={serviceType === service.id ? '#ffffff' : '#3ccfa0'} 
+                  />
+                ) : (
+                  <Ionicons 
+                    name={service.icon as any} 
+                    size={24} 
+                    color={serviceType === service.id ? '#ffffff' : '#3ccfa0'} 
+                  />
+                )}
+              </View>
               <Text style={[
                 styles.serviceName,
                 serviceType === service.id && styles.serviceNameActive,
               ]}>
                 {service.name}
               </Text>
-              {/* <Text style={[
-                styles.serviceDescription,
-                serviceType === service.id && styles.serviceDescriptionActive,
-              ]}>
-                {service.description}
-              </Text> */}
-            </View>
-            {/* {serviceType === service.id && (
-              <View style={styles.checkmark}>
-                <MaterialIcons name="check" size={16} color="#ffffff" />
-              </View>
-            )} */}
-          </TouchableOpacity>
-        ))}
-        
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       {/* Trip Type Selection */}
       {(serviceType === 'outstation' || serviceType === 'airport') && (
         <View style={styles.tripTypeSection}>
-          <Text style={styles.tripTypeLabel}>Trip Type</Text>
           <View style={styles.tripTypeContainer}>
             {serviceType === 'outstation' ? (
               <>
@@ -202,36 +200,29 @@ export const ServiceTypeStep: React.FC<ServiceTypeStepProps> = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fffbeb',
+    backgroundColor: '#f8f9fa',
   },
   header: {
-    padding: 12,
+    padding: 16,
     alignItems: 'center',
+    marginBottom: 8,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#78350f',
-    marginBottom: 6,
+    color: '#3ccfa0',
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#92400e',
+    color: '#64748b',
     textAlign: 'center',
   },
-  serviceGrid: {
-    padding: 2,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-  },
-  serviceCard: {
+  serviceTypeContainer: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
-    flexDirection: 'column',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#e2e8f0',
+    margin: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -241,101 +232,84 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  serviceGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  serviceCard: {
+    width: '48%',
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'column',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
   serviceCardActive: {
-    borderColor: '#f59e0b',
-    backgroundColor: '#fef3c7',
+    borderColor: '#3ccfa0',
+    backgroundColor: '#ecfdf5',
   },
   serviceIconContainer: {
-    width:36,
-    height: 36,
-    borderRadius: 24,
-    backgroundColor: '#fef3c7',
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: '#ecfdf5',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginBottom: 8,
   },
-  serviceIcon: {
-    fontSize: 20,
-  },
-  serviceContent: {
-    flex: 1,
+  serviceIconContainerActive: {
+    backgroundColor: '#3ccfa0',
   },
   serviceName: {
-    fontSize: 12,
-    fontWeight: '400',
-    color: '#78350f',
-    marginBottom: 1,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+    textAlign: 'center',
   },
   serviceNameActive: {
-    color: '#b45309',
-  },
-  serviceDescription: {
-    fontSize: 12,
-    color: '#92400e',
-  },
-  serviceDescriptionActive: {
-    color: '#78350f',
-  },
-  checkmark: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#f59e0b',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  footer: {
-    padding: 12,
-    paddingBottom: 24,
-  },
-  nextButton: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  nextButtonDisabled: {
-    backgroundColor: '#cbd5e1',
-  },
-  nextButtonText: {
-    fontSize: 14,
+    color: '#3ccfa0',
     fontWeight: '600',
-    color: '#ffffff',
-  },
-  nextButtonTextDisabled: {
-    color: '#64748b',
   },
   tripTypeSection: {
-    paddingHorizontal: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 16,
     marginBottom: 16,
-  },
-  tripTypeLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1e293b',
-    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   tripTypeContainer: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 12,
     marginBottom: 12,
   },
   tripTypeButton: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: '#ffffff',
-    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#e2e8f0',
     alignItems: 'center',
   },
   tripTypeButtonActive: {
-    backgroundColor: '#f59e0b',
-    borderColor: '#f59e0b',
+    backgroundColor: '#3ccfa0',
+    borderColor: '#3ccfa0',
   },
   tripTypeButtonText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '500',
     color: '#64748b',
   },
@@ -352,20 +326,41 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   checkbox: {
-    width: 18,
-    height: 18,
-    borderRadius: 3,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: '#e2e8f0',
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#f59e0b',
-    borderColor: '#f59e0b',
+    backgroundColor: '#3ccfa0',
+    borderColor: '#3ccfa0',
   },
   checkboxLabel: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#64748b',
+  },
+  footer: {
+    padding: 16,
+    paddingBottom: 24,
+  },
+  nextButton: {
+    backgroundColor: '#3ccfa0',
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  nextButtonDisabled: {
+    backgroundColor: '#e2e8f0',
+  },
+  nextButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  nextButtonTextDisabled: {
+    color: '#94a3b8',
   },
 });

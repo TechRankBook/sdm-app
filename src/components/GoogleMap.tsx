@@ -419,8 +419,10 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
         {routeCoordinates.length > 0 && (
           <Polyline
             coordinates={routeCoordinates}
-            strokeColor="#2563eb"
-            strokeWidth={4}
+            strokeColor="#2dd4bf" // Teal color from the modern theme
+            strokeWidth={5}
+            lineDashPattern={[0]}
+            lineCap="round"
           />
         )}
       </MapView>
@@ -553,15 +555,15 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   locationButtonActive: {
-    borderColor: '#f59e0b',
-    backgroundColor: '#fef3c7',
+    borderColor: '#2dd4bf', // Teal color from the modern theme
+    backgroundColor: '#f0fdfa', // Very light teal background
   },
   locationButtonText: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: '#475569',
   },
   locationButtonTextActive: {
-    color: '#92400e',
+    color: '#0d9488', // Darker teal for active text
   },
 });

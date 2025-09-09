@@ -4,15 +4,17 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
+  Image,
+  Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { CommonActions } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 // Import services and stores
 import { AuthService } from '../../services/supabase/auth';
@@ -74,17 +76,29 @@ export default function AuthFlowScreen() {
 
   const handleSendOTP = async () => {
     if (!canSend) {
-      Alert.alert('Please Wait', `You can send OTP again in ${sendTimer} seconds`);
+      Toast.show({
+        type: 'warning',
+        text1: 'Please Wait',
+        text2: `You can send OTP again in ${sendTimer} seconds`,
+      });
       return;
     }
 
     if (!phoneNumber.trim()) {
-      Alert.alert('Error', 'Please enter your phone number');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter your phone number',
+      });
       return;
     }
 
     if (!AuthService.isValidPhone(phoneNumber)) {
-      Alert.alert('Error', 'Please enter a valid 10-digit phone number');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter a valid 10-digit phone number',
+      });
       return;
     }
 
@@ -95,9 +109,18 @@ export default function AuthFlowScreen() {
       const { data, error } = await AuthService.signInWithPhone(phoneNumber.trim());
 
       if (error) {
-        Alert.alert('Error', getUserFriendlyError(error));
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: getUserFriendlyError(error),
+        });
       } else {
         console.log('OTP sent successfully, navigating to OTPVerification');
+        Toast.show({
+          type: 'success',
+          text1: 'OTP Sent',
+          text2: 'Verification code sent to your phone',
+        });
 
         console.log('Navigation object:', navigation);
         console.log('Navigation type:', typeof navigation);
@@ -136,7 +159,11 @@ export default function AuthFlowScreen() {
       }
     } catch (error) {
       console.error('Send OTP error:', error);
-      Alert.alert('Error', getUserFriendlyError(error as Error));
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: getUserFriendlyError(error as Error),
+      });
     } finally {
       setIsLoading(false);
       // Don't call setLoading(false) to avoid re-rendering AppNavigator
@@ -151,14 +178,27 @@ export default function AuthFlowScreen() {
       const { data, error } = await AuthService.signInWithGoogle();
 
       if (error) {
-        Alert.alert('Error', error.message || 'Failed to sign in with Google');
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: error.message || 'Failed to sign in with Google',
+        });
       } else {
         // Navigation will be handled automatically by the auth state listener
         console.log('Google sign-in initiated');
+        Toast.show({
+          type: 'info',
+          text1: 'Google Sign-In',
+          text2: 'Redirecting to Google...',
+        });
       }
     } catch (error) {
       console.error('Google sign-in error:', error);
-      Alert.alert('Error', getUserFriendlyError(error as Error));
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: getUserFriendlyError(error as Error),
+      });
     } finally {
       setIsLoading(false);
       // Don't call setLoading(false) to avoid re-rendering AppNavigator
@@ -170,7 +210,11 @@ export default function AuthFlowScreen() {
       navigation.navigate('ForgotPassword');
     } catch (error) {
       console.error('Navigation error:', error);
-      Alert.alert('Error', 'Unable to navigate to forgot password screen');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Unable to navigate to forgot password screen',
+      });
     }
   };
 
@@ -185,118 +229,179 @@ export default function AuthFlowScreen() {
         style={styles.scrollView}
       >
         <View style={styles.content}>
-          {/* Header */}
-          <View style={styles.header}>
-            <Text style={styles.title}>Welcome to SDM</Text>
-            <Text style={styles.subtitle}>
-              Get in to your SDM emobility Services account.
-            </Text>
+          {/* Logo */}
+          <View style={styles.logoContainer}>
+            <Text style={styles.logoText}>SDM</Text>
           </View>
 
-          {/* Form */}
-          <View style={styles.form}>
-            {/* Phone Input */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Phone Number</Text>
-              <View style={styles.phoneInputContainer}>
-                <Text style={styles.countryCode}>+91</Text>
-                <TextInput
-                  style={styles.phoneInput}
-                  placeholder="Enter 10-digit phone number"
-                  value={phoneNumber}
-                  onChangeText={setPhoneNumber}
-                  keyboardType="phone-pad"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!isLoading}
-                  maxLength={10}
-                  placeholderTextColor="#64748b"
-                />
-              </View>
-            </View>
-
-            {/* Forgot Password
-            <TouchableOpacity
-              onPress={handleForgotPassword}
-              style={styles.forgotPassword}
-              disabled={isLoading}
-            >
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity> */}
-
-            {/* Send OTP Button */}
-            <TouchableOpacity
-              onPress={handleSendOTP}
-              style={[styles.button, (isLoading || !canSend) && styles.buttonDisabled]}
-              disabled={isLoading || !canSend}
-            >
-              <Text style={styles.buttonText}>
-                {isLoading
-                  ? 'Sending OTP...'
-                  : !canSend
-                    ? `Send OTP in ${sendTimer}s`
-                    : 'Send OTP'
-                }
+          {/* Hero Section */}
+          <View style={styles.heroContainer}>
+            <View style={styles.heroContent}>
+              <Text style={styles.heroTitle}>
+                <Text style={styles.heroTitleDark}>Electric</Text>{'\n'}
+                <Text style={styles.heroTitleGreen}>Mobility</Text>{'\n'}
+                <Text style={styles.heroTitleDark}>Reimagined</Text>
               </Text>
-            </TouchableOpacity>
+              <Text style={styles.heroSubtitle}>
+                Experience the future of urban transportation with SDM E-Mobility. Clean, smart, and sustainable rides at your fingertips.
+              </Text>
+            </View>
           </View>
 
-          {/* Google Sign In */}
-          {/* <View style={styles.googleSection}>
-            <View style={styles.divider}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or</Text>
-              <View style={styles.dividerLine} />
+          {/* Form Card */}
+          <View style={styles.formCard}>
+            <View style={styles.header}>
+              <Text style={styles.title}>Get Started</Text>
+              <Text style={styles.subtitle}>
+                Enter your phone number to access your SDM emobility Services account.
+              </Text>
             </View>
 
-            <TouchableOpacity
-              onPress={handleGoogleSignIn}
-              style={[styles.googleButton, isLoading && styles.buttonDisabled]}
-              disabled={isLoading}
-            >
-              <Text style={styles.googleButtonText}>Continue with Google</Text>
-            </TouchableOpacity>
-          </View> */}
+            {/* Form */}
+            <View style={styles.form}>
+              {/* Phone Input */}
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Phone Number</Text>
+                <View style={styles.phoneInputContainer}>
+                  <Text style={styles.countryCode}>+91</Text>
+                  <TextInput
+                    style={styles.phoneInput}
+                    placeholder="Enter 10-digit phone number"
+                    value={phoneNumber}
+                    onChangeText={setPhoneNumber}
+                    keyboardType="phone-pad"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!isLoading}
+                    maxLength={10}
+                    placeholderTextColor="#64748b"
+                  />
+                </View>
+              </View>
+
+              {/* Send OTP Button */}
+              <TouchableOpacity
+                onPress={handleSendOTP}
+                style={[styles.button, (isLoading || !canSend) && styles.buttonDisabled]}
+                disabled={isLoading || !canSend}
+              >
+                <Text style={styles.buttonText}>
+                  {isLoading
+                    ? 'Sending OTP...'
+                    : !canSend
+                      ? `Send OTP in ${sendTimer}s`
+                      : 'Send OTP'
+                  }
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Stats Section */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>2.5M+</Text>
+              <Text style={styles.statLabel}>Happy Riders</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>50K+</Text>
+              <Text style={styles.statLabel}>Drivers</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>100%</Text>
+              <Text style={styles.statLabel}>Electric</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.statValue}>24/7</Text>
+              <Text style={styles.statLabel}>Available</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
+const { width } = Dimensions.get('window');
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8f9fa',
   },
   scrollView: {
     flex: 1,
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
     paddingHorizontal: 24,
-    paddingVertical: 48,
+    paddingVertical: 40,
   },
-  header: {
-    alignItems: 'center',
+  logoContainer: {
+    alignItems: 'flex-start',
+    marginBottom: 20,
+  },
+  logoText: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
+    letterSpacing: 1,
+  },
+  heroContainer: {
     marginBottom: 32,
   },
+  heroContent: {
+    marginBottom: 20,
+  },
+  heroTitle: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    lineHeight: 44,
+    marginBottom: 16,
+  },
+  heroTitleDark: {
+    color: '#1e293b',
+  },
+  heroTitleGreen: {
+    color: '#2dd4bf', // Teal color from the web app
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#64748b',
+    marginBottom: 24,
+    maxWidth: '90%',
+  },
+  formCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 32,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 15,
+    elevation: 4,
+  },
+  header: {
+    marginBottom: 24,
+  },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
     color: '#1e293b',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#64748b',
-    textAlign: 'center',
+    lineHeight: 22,
   },
   form: {
-    marginBottom: 16,
+    marginBottom: 8,
   },
   inputGroup: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   label: {
     fontSize: 14,
@@ -308,41 +413,44 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#e2e8f0',
     borderRadius: 8,
     backgroundColor: '#ffffff',
+    overflow: 'hidden',
   },
   countryCode: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
     color: '#374151',
+    backgroundColor: '#f8fafc',
     borderRightWidth: 1,
-    borderRightColor: '#d1d5db',
+    borderRightColor: '#e2e8f0',
   },
   phoneInput: {
     flex: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
     fontSize: 16,
+    color: '#1e293b',
   },
   forgotPassword: {
     alignSelf: 'flex-end',
   },
   forgotPasswordText: {
-    color: '#2563eb',
+    color: '#2dd4bf', // Teal color from the web app
     fontSize: 14,
     fontWeight: '500',
   },
   button: {
-    backgroundColor: '#2563eb',
+    backgroundColor: '#2dd4bf', // Teal color from the web app
     borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 14,
     alignItems: 'center',
     marginTop: 24,
   },
   buttonDisabled: {
-    opacity: 0.5,
+    opacity: 0.6,
   },
   buttonText: {
     color: '#ffffff',
@@ -360,7 +468,7 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: '#d1d5db',
+    backgroundColor: '#e2e8f0',
   },
   dividerText: {
     paddingHorizontal: 16,
@@ -369,9 +477,9 @@ const styles = StyleSheet.create({
   },
   googleButton: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#e2e8f0',
     borderRadius: 8,
-    paddingVertical: 12,
+    paddingVertical: 14,
     alignItems: 'center',
     backgroundColor: '#ffffff',
   },
@@ -379,5 +487,34 @@ const styles = StyleSheet.create({
     color: '#374151',
     fontSize: 16,
     fontWeight: '500',
+  },
+  statsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
+  statItem: {
+    width: '48%',
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  statValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#2dd4bf', // Teal color from the web app
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: '#64748b',
   },
 });

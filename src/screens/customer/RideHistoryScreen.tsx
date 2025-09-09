@@ -31,12 +31,14 @@ export default function RideHistoryScreen() {
         .from('bookings')
         .select(`
           *,
-          driver:driver_id (
+          driver:drivers!drivers_user_id_fkey (
             id,
-            full_name
+            user:users!drivers_user_id_fkey (
+              full_name
+            )
           )
         `)
-        .eq('customer_id', user.id)
+        .eq('user_id', user.id)
         .eq('status', 'completed')
         .order('created_at', { ascending: false });
 
@@ -161,7 +163,7 @@ export default function RideHistoryScreen() {
                 <View style={styles.detailRow}>
                   <Text style={styles.detailLabel}>Driver:</Text>
                   <Text style={styles.detailValue}>
-                    {(ride as any).driver?.full_name || 'Not assigned'}
+                    {(ride as any).driver?.user?.full_name || 'Not assigned'}
                   </Text>
                 </View>
                 <View style={styles.detailRow}>

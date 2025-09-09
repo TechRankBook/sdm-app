@@ -1,7 +1,8 @@
 import React, { useCallback } from 'react';
-import { ScrollView, Alert, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import Toast from 'react-native-toast-message';
 
 // Import types and navigation
 import { CustomerTabParamList } from '@/types/navigation';
@@ -18,17 +19,15 @@ export default function BookRideScreen() {
     // Here you would typically send the booking data to your backend
     console.log('Booking completed:', bookingData);
 
-    // For now, show success message and navigate back
-    Alert.alert(
-      'Booking Confirmed!',
-      'Your ride has been booked successfully. You will receive a confirmation shortly.',
-      [
-        {
-          text: 'OK',
-          onPress: () => navigation.navigate('Home')
-        }
-      ]
-    );
+    // Show success toast and navigate back
+    Toast.show({
+      type: 'success',
+      text1: 'Booking Confirmed!',
+      text2: 'Your ride has been booked successfully.',
+      onPress: () => {
+        navigation.navigate('Home');
+      },
+    });
   }, [navigation]);
 
   return (
@@ -41,6 +40,6 @@ export default function BookRideScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fffbeb',
+    backgroundColor: '#f8f9fa',
   },
 });

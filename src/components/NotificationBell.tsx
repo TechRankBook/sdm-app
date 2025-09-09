@@ -5,10 +5,10 @@ import {
   TouchableOpacity,
   Modal,
   ScrollView,
-  Alert,
   StyleSheet,
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import Toast from 'react-native-toast-message';
 import { useAppStore } from '../stores/appStore';
 
 export default function NotificationBell() {
@@ -22,23 +22,23 @@ export default function NotificationBell() {
   };
 
   const handleClearAll = () => {
-    Alert.alert(
-      'Clear All Notifications',
-      'Are you sure you want to mark all notifications as read?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear All',
-          onPress: () => {
-            notifications.forEach(notification => {
-              if (!notification.is_read) {
-                markNotificationAsRead(notification.id);
-              }
-            });
+    Toast.show({
+      type: 'info',
+      text1: 'Clear All Notifications',
+      text2: 'Are you sure you want to mark all notifications as read?',
+      onPress: () => {
+        notifications.forEach(notification => {
+          if (!notification.is_read) {
+            markNotificationAsRead(notification.id);
           }
-        },
-      ]
-    );
+        });
+        Toast.show({
+          type: 'success',
+          text1: 'Notifications Cleared',
+          text2: 'All notifications have been marked as read.',
+        });
+      },
+    });
   };
 
   return (
@@ -47,7 +47,7 @@ export default function NotificationBell() {
         style={styles.bellContainer}
         onPress={() => setShowNotifications(true)}
       >
-        <MaterialIcons name="notifications" size={20} color="#64748b" />
+        <MaterialIcons name="notifications" size={24} color="#ffffff" />
         {unreadCount > 0 && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
@@ -160,14 +160,16 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: -2,
-    right: -2,
-    backgroundColor: '#dc2626',
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    top: -4,
+    right: -4,
+    backgroundColor: '#f43f5e', // Rose color for notification badge
+    borderRadius: 12,
+    minWidth: 22,
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: '#ffffff',
   },
   badgeText: {
     color: '#ffffff',

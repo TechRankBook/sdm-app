@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing, ScrollView } from 'react-native';
+import { View, StyleSheet, Animated, Easing, ScrollView, Text } from 'react-native';
 import { ServiceType, VehicleType } from '@/types';
 import { GoogleMap } from '@/components/GoogleMap';
 import { ServiceTypeStep } from '@/components/booking/ServiceTypeStep';
@@ -278,7 +278,26 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
   return (
     <View style={styles.container}>
       <View style={styles.contentContainer}>
-        {/* Left side - Map (50%) */}
+        {/* Top Navigation Bar */}
+        <View style={styles.topBar}>
+          <View style={styles.stepIndicator}>
+            {stepLabels.map((label, index) => (
+              <View 
+                key={index} 
+                style={[
+                  styles.stepDot, 
+                  index + 1 === currentStep ? styles.stepDotActive : 
+                  index + 1 < currentStep ? styles.stepDotCompleted : {}
+                ]}
+              />
+            ))}
+          </View>
+          <Text style={styles.stepLabel}>
+            Step {currentStep} of {totalSteps}: {stepLabels[currentStep - 1]}
+          </Text>
+        </View>
+
+        {/* Map Container */}
         <View style={styles.mapContainer}>
           <GoogleMap
             pickupLocation={pickupCoords}
@@ -298,7 +317,7 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
           />
         </View>
 
-        {/* Bottom side - Form (scrollable) */}
+        {/* Form Container */}
         <View style={styles.formContainer}>
           <ScrollView
             style={styles.scrollContainer}
@@ -328,22 +347,96 @@ export const BookingFlow: React.FC<BookingFlowProps> = ({ onBookingComplete }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fffbeb',
+    backgroundColor: '#f8f9fa',
   },
   contentContainer: {
     flex: 1,
     flexDirection: 'column',
   },
+  topBar: {
+    backgroundColor: '#ffffff',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  stepIndicator: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  stepDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#e2e8f0',
+  },
+  stepDotActive: {
+    backgroundColor: '#2dd4bf', // Teal color from the modern theme
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  stepDotCompleted: {
+    backgroundColor: '#a7f3d0', // Light teal for completed steps
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  stepLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e293b',
+  },
   mapContainer: {
     height: 300, // Fixed height for map
     backgroundColor: '#ffffff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
   },
   formContainer: {
     flex: 1,
-    backgroundColor: '#fffbeb',
+    backgroundColor: '#f8f9fa',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -20,
+    paddingTop: 24,
+    paddingHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 4,
+    zIndex: 10,
   },
   stepContainer: {
     flex: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 24,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   scrollContainer: {
     flex: 1,
