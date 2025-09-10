@@ -330,7 +330,7 @@ export default function ProfileScreen({ navigation }: { navigation: any }) {
             uploadError.message?.includes('StorageUnknownError')) {
           console.log('🔄 Primary upload failed, trying REST API fallback...');
           try {
-            const restResult = await uploadWithRestAPI(filePath, blob);
+            const restResult = await uploadWithRestAPI(filePath, blob, 'image/jpeg');
             if (restResult.success) {
               console.log('✅ REST API upload successful!');
               uploadData = restResult.data;
