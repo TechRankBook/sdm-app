@@ -10,6 +10,8 @@ import RideHistoryScreen from '@/screens/customer/RideHistoryScreen';
 import ProfileScreen from '@/screens/customer/ProfileScreen';
 import SupportScreen from '@/screens/customer/SupportScreen';
 import PaymentScreen from '@/screens/customer/PaymentScreen';
+import TripDetailsScreen from '@/screens/customer/trip/TripDetailsScreen';
+import RideTrackingScreen from '@/screens/customer/trip/RideTrackingScreen';
 
 // Import components
 import NotificationBell from '@/components/NotificationBell';
@@ -137,6 +139,40 @@ export default function CustomerNavigator() {
         component={PaymentScreen}
         options={{
           title: 'Payment',
+          headerStyle: {
+            backgroundColor: '#2dd4bf', // Teal color from the modern theme
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          headerTintColor: '#ffffff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 18,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="TripDetails"
+        component={TripDetailsScreen}
+        options={{
+          title: 'Trip Details',
+          headerStyle: {
+            backgroundColor: '#2dd4bf', // Teal color from the modern theme
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          headerTintColor: '#ffffff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            fontSize: 18,
+          },
+        }}
+      />
+      <Stack.Screen
+        name="TrackRide"
+        component={RideTrackingScreen}
+        options={{
+          title: 'Track Ride',
           headerStyle: {
             backgroundColor: '#2dd4bf', // Teal color from the modern theme
             elevation: 0,

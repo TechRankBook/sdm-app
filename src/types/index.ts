@@ -1,12 +1,23 @@
 export type UserRole = 'customer' | 'driver' | 'admin' | 'vendor';
 
-export type BookingStatus = 'pending' | 'accepted' | 'in_progress' | 'completed' | 'cancelled';
+export type BookingStatus = 'pending' | 'accepted' | 'started' | 'in_progress' | 'completed' | 'cancelled';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export type ServiceType = 'city' | 'airport' | 'outstation' | 'hourly';
 
 export type VehicleType = 'sedan' | 'suv' | 'premium' | 'hatchback';
+
+export interface BookingDriver {
+  id: string;
+  vehicle_model?: string;
+  license_plate?: string;
+  rating?: number;
+  user: {
+    full_name: string;
+    phone_no: string;
+  };
+}
 
 export interface User {
   id: string;
@@ -72,39 +83,57 @@ export interface Vehicle {
 }
 
 export interface Booking {
+  vehicle_id: string | undefined;
+  waiting_time_minutes?: number;
+  payment_status: string | undefined;
   fare_amount: number;
-  driver: any;
+  driver?: BookingDriver | null;
   dropoff_address: string;
   pickup_address: string;
   id: string;
   customer_id: string;
   driver_id?: string;
   service_type: ServiceType;
+  ride_type?: string;
   pickup_location: Location;
   drop_location?: Location;
   scheduled_time?: string;
   status: BookingStatus;
   vehicle_type: VehicleType;
+  vehicle?: Vehicle | null;
   estimated_fare: number;
   actual_fare?: number;
   distance_km?: number;
+  distance?: number;
   duration_minutes?: number;
   passenger_count: number;
+  passengers?: number;
   special_instructions?: string;
   created_at: string;
   updated_at: string;
+  started_at?: string;
+  completed_at?: string;
+  trip_type?: string;
+  is_round_trip?: boolean;
+  cancellation_reason?: string;
+  payment?: Payment | null;
+  advance_amount?: number;
+  payment_method?: string;
+  remaining_amount?: number;
 }
 
 export interface Payment {
   id: string;
   booking_id: string;
   amount: number;
+  amount_paid?: number;
   currency: string;
   status: PaymentStatus;
   payment_method: string;
   transaction_id?: string;
   razorpay_order_id?: string;
   razorpay_payment_id?: string;
+  gateway_response?: any;
   created_at: string;
   updated_at: string;
 }

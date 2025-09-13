@@ -150,12 +150,12 @@ export default function VehicleDocumentsScreen({ navigation }: { navigation: any
     }
   };
 
-  const documentTypes = [
-    { key: 'insurance', label: 'Insurance Document', icon: 'verified' },
-    { key: 'registration', label: 'Registration Certificate', icon: 'assignment' },
-    { key: 'pollution', label: 'Pollution Certificate', icon: 'eco' },
-    { key: 'license', label: 'Driving License', icon: 'card-membership' },
-  ];
+  // const documentTypes = [
+  //   { key: 'insurance', label: 'Insurance Document', icon: 'verified' },
+  //   { key: 'registration', label: 'Registration Certificate', icon: 'assignment' },
+  //   { key: 'pollution', label: 'Pollution Certificate', icon: 'eco' },
+  //   { key: 'license', label: 'Driving License', icon: 'card-membership' },
+  // ];
 
   if (isLoading) {
     return (
@@ -185,7 +185,7 @@ export default function VehicleDocumentsScreen({ navigation }: { navigation: any
           </View>
         ) : (
           <>
-            {/* Upload Section */}
+            {/* Upload Section
             <View style={styles.card}>
               <Text style={styles.sectionTitle}>Upload New Document</Text>
               {documentTypes.map((docType) => (
@@ -200,11 +200,11 @@ export default function VehicleDocumentsScreen({ navigation }: { navigation: any
                   {uploading && <ActivityIndicator size="small" color="#3b82f6" />}
                 </TouchableOpacity>
               ))}
-            </View>
+            </View> */}
 
             {/* Documents List */}
             <View style={styles.card}>
-              <Text style={styles.sectionTitle}>Existing Documents</Text>
+              <Text style={styles.sectionTitle}>Documents</Text>
               {documents.length === 0 ? (
                 <Text style={styles.noDocumentsText}>No documents uploaded yet</Text>
               ) : (

@@ -22,11 +22,15 @@ export type DriverTabParamList = {
 
 export type CustomerStackParamList = {
   CustomerTabs: undefined;
+  RideHistory: undefined;
   Payment: {
     bookingId: string;
     amount: number;
     description: string;
   };
+  TripDetails: { bookingId: string };
+  TrackRide: { bookingId: string; driverId: string; vehicleId: string };
+  ReviewModal: { bookingId: string; driverId: string; driverName: string };
   // Add other customer screens here
 };
 
@@ -44,3 +48,5 @@ export type RootStackParamList = {
   Customer: undefined;
   Driver: undefined;
 };
+
+  
